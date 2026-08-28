@@ -1,4 +1,5 @@
 export const users = [
+  { id: 'u0', name: 'System Admin', role: 'admin', email: 'admin@prismo.com' },
   { id: 'u1', name: 'CEO User', role: 'ceo', email: 'ceo@prismo.com' },
   { id: 'u2', name: 'Project Manager 1', role: 'pm', email: 'pm@prismo.com' },
   { id: 'u3', name: 'Site Engineer A', role: 'site_engineer', email: 'engineer@prismo.com' },
