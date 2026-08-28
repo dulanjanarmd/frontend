@@ -22,24 +22,26 @@ const Navbar = () => {
 
   const navItems = {
     admin: [
-      { name: 'Admin Portal', path: '/admin', icon: <Shield className="w-4 h-4 mr-2" /> },
+      { name: 'Admin Portal', path: '/portal/admin', icon: <Shield className="w-4 h-4 mr-2" /> },
     ],
     ceo: [
-      { name: 'Portfolio', path: '/', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
+      { name: 'Portfolio', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
+      { name: 'Consultations', path: '/portal/consultations', icon: <MessageSquare className="w-4 h-4 mr-2" /> },
     ],
     pm: [
-      { name: 'Dashboard', path: '/', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
-      { name: 'Projects', path: '/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
-      { name: 'Tasks', path: '/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
-      { name: 'Approvals', path: '/approvals', icon: <MessageSquare className="w-4 h-4 mr-2" /> },
+      { name: 'Dashboard', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
+      { name: 'Consultations', path: '/portal/consultations', icon: <MessageSquare className="w-4 h-4 mr-2" /> },
+      { name: 'Projects', path: '/portal/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
+      { name: 'Tasks', path: '/portal/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
+      { name: 'Approvals', path: '/portal/approvals', icon: <MessageSquare className="w-4 h-4 mr-2" /> },
     ],
     site_engineer: [
-      { name: 'My Tasks', path: '/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
-      { name: 'Daily Logs', path: '/logs', icon: <Camera className="w-4 h-4 mr-2" /> },
+      { name: 'My Tasks', path: '/portal/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
+      { name: 'Daily Logs', path: '/portal/logs', icon: <Camera className="w-4 h-4 mr-2" /> },
     ],
     client: [
-      { name: 'My Project', path: '/', icon: <Briefcase className="w-4 h-4 mr-2" /> },
-      { name: 'Approvals', path: '/approvals', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
+      { name: 'My Project', path: '/portal', icon: <Briefcase className="w-4 h-4 mr-2" /> },
+      { name: 'Approvals', path: '/portal/approvals', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
     ]
   };
 
@@ -153,7 +155,7 @@ const Layout = () => {
       <footer className="bg-slate-900 text-slate-400 mt-auto py-12 px-6 overflow-hidden relative">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <h2 className="text-3xl font-bold text-white mb-2">visibuild</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">Prismo Constructions</h2>
             <p className="text-sm">Digital Transformation Platform for Construction Consultancy</p>
           </div>
           <div>

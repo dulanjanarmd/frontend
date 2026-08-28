@@ -18,7 +18,7 @@ const Login = () => {
     
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/portal');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,7 +66,7 @@ const Login = () => {
           className="w-full max-w-md"
         >
           <div className="mb-10 text-center">
-            <h1 className="text-4xl font-bold text-white mb-4">visibuild</h1>
+            <h1 className="text-4xl font-bold text-white mb-4">Prismo Constructions</h1>
             <p className="text-lg">Welcome back. Please sign in.</p>
           </div>
 

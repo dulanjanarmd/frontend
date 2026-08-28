@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { initialProjects, initialTasks, initialLogs, initialClientApprovals } from '../utils/mockData';
+import { initialProjects, initialTasks, initialLogs, initialClientApprovals, initialConsultations } from '../utils/mockData';
 
 const DataContext = createContext();
 
@@ -16,6 +16,7 @@ export const DataProvider = ({ children }) => {
   const [tasks, setTasks] = useState(initialTasks);
   const [logs, setLogs] = useState(initialLogs);
   const [approvals, setApprovals] = useState(initialClientApprovals);
+  const [consultations, setConsultations] = useState(initialConsultations);
 
   const addProject = (project) => setProjects([...projects, { ...project, id: `p${Date.now()}` }]);
   const updateProject = (id, updates) => setProjects(projects.map(p => p.id === id ? { ...p, ...updates } : p));
@@ -28,11 +29,15 @@ export const DataProvider = ({ children }) => {
   const updateApproval = (id, updates) => setApprovals(approvals.map(a => a.id === id ? { ...a, ...updates } : a));
   const addApprovalRequest = (request) => setApprovals([...approvals, { ...request, id: `a${Date.now()}` }]);
 
+  const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);
+  const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
+
   const value = {
     projects, addProject, updateProject,
     tasks, addTask, updateTask,
     logs, addLog,
-    approvals, updateApproval, addApprovalRequest
+    approvals, updateApproval, addApprovalRequest,
+    consultations, addConsultation, updateConsultation
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import { useAuth } from './context/AuthContext';
 
+import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Logs from './pages/Logs';
@@ -10,6 +11,7 @@ import Approvals from './pages/Approvals';
 import Tasks from './pages/Tasks';
 import Login from './pages/Login';
 import AdminPortal from './pages/AdminPortal';
+import Consultations from './pages/Consultations';
 
 const RequireAuth = ({ children, allowedRoles }) => {
   const { currentUser } = useAuth();
@@ -20,7 +22,7 @@ const RequireAuth = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/portal" replace />;
   }
 
   return children;
@@ -39,26 +41,37 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <Login />} />
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={currentUser ? <Navigate to="/portal" replace /> : <Login />} />
       
-      <Route path="/" element={
+      {/* Protected Portal Routes */}
+      <Route path="/portal" element={
         <RequireAuth>
           <Layout />
         </RequireAuth>
       }>
         <Route index element={
-          currentUser?.role === 'admin' ? <Navigate to="/admin" replace /> : <Dashboard />
+          currentUser?.role === 'admin' ? <Navigate to="/portal/admin" replace /> : <Dashboard />
         } />
         <Route path="projects" element={<Projects />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="logs" element={<Logs />} />
         <Route path="approvals" element={<Approvals />} />
+        <Route path="consultations" element={
+          <RequireAuth allowedRoles={['pm', 'ceo', 'admin']}>
+            <Consultations />
+          </RequireAuth>
+        } />
         <Route path="admin" element={
           <RequireAuth allowedRoles={['admin']}>
             <AdminPortal />
           </RequireAuth>
         } />
       </Route>
+      
+      {/* Catch all redirect to public page */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
