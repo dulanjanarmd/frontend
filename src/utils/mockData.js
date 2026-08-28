@@ -73,7 +73,7 @@ export const initialLogs = [
     manpower: 12,
     workDone: 'Cleared the initial debris and set up the site office.',
     percentageCompleted: 2,
-    photos: ['https://images.unsplash.com/photo-1541888081622-6323c21c7e92?q=80&w=2070&auto=format&fit=crop'],
+    photos: [{ url: 'https://images.unsplash.com/photo-1541888081622-6323c21c7e92?q=80&w=2070&auto=format&fit=crop', caption: 'Initial site clearance' }],
     issues: 'Minor delay in equipment arrival.',
     submittedBy: 'u3'
   }
