@@ -8,9 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Logs from './pages/Logs';
 import Approvals from './pages/Approvals';
-
-// Placeholders for Pages
-const Tasks = () => <div className="p-4"><h1 className="text-2xl font-bold">Tasks</h1></div>;
+import Tasks from './pages/Tasks';
 
 function App() {
   const { currentUser } = useAuth();
