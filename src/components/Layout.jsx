@@ -12,15 +12,18 @@ import {
   Moon,
   LogOut,
   User,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield
 } from 'lucide-react';
-import { users } from '../utils/mockData';
 
 const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, toggleTheme }) => {
-  const { currentUser, login, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
   const location = useLocation();
 
   const navItems = {
+    admin: [
+      { name: 'Admin Portal', path: '/admin', icon: <Shield className="w-5 h-5" /> },
+    ],
     ceo: [
       { name: 'Portfolio Overview', path: '/', icon: <LayoutDashboard className="w-5 h-5" /> },
     ],
@@ -71,29 +74,16 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, toggleTheme }) => {
 
       <div className="absolute bottom-0 w-full p-4 border-t border-border bg-background/50 backdrop-blur-sm">
         <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300">
-                <User className="w-5 h-5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{currentUser?.name}</span>
-                <span className="text-xs text-slate-500 capitalize">{currentUser?.role.replace('_', ' ')}</span>
-              </div>
+          <div className="flex items-center space-x-3 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
+            <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 flex-shrink-0">
+              <User className="w-5 h-5" />
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">{currentUser?.name}</span>
+              <span className="text-xs text-slate-500 capitalize">{currentUser?.role.replace('_', ' ')}</span>
             </div>
           </div>
           
-          <select 
-            className="w-full bg-slate-100 dark:bg-slate-800 text-sm rounded-md p-2 border-none focus:ring-2 focus:ring-primary outline-none"
-            value={currentUser?.id}
-            onChange={(e) => login(e.target.value)}
-          >
-            <option value="" disabled>Switch Role</option>
-            {users.map(u => (
-              <option key={u.id} value={u.id}>{u.name} ({u.role})</option>
-            ))}
-          </select>
-
           <div className="flex items-center justify-between pt-2">
             <button 
               onClick={toggleTheme}
@@ -103,9 +93,9 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, toggleTheme }) => {
             </button>
             <button 
               onClick={logout}
-              className="flex items-center text-sm text-red-500 hover:text-red-700 transition-colors"
+              className="flex items-center text-sm text-red-500 hover:text-red-700 transition-colors px-3 py-2 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md"
             >
-              <LogOut className="w-4 h-4 mr-1" />
+              <LogOut className="w-4 h-4 mr-2" />
               Logout
             </button>
           </div>
