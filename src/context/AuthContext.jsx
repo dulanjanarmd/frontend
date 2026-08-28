@@ -21,19 +21,25 @@ export const AuthProvider = ({ children }) => {
     if (storedUserId) {
       const user = users.find(u => u.id === storedUserId);
       if (user) setCurrentUser(user);
-    } else {
-      // Default to CEO for demo purposes if not logged in
-      setCurrentUser(users[0]);
     }
     setLoading(false);
   }, []);
 
-  const login = (userId) => {
-    const user = users.find(u => u.id === userId);
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('mockUserId', user.id);
-    }
+  const login = async (email, password) => {
+    // Simulated async login
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // Find user by email (ignoring password for this mock)
+        const user = users.find(u => u.email === email);
+        if (user) {
+          setCurrentUser(user);
+          localStorage.setItem('mockUserId', user.id);
+          resolve(user);
+        } else {
+          reject(new Error('Invalid email or password'));
+        }
+      }, 500);
+    });
   };
 
   const logout = () => {
