@@ -61,16 +61,6 @@ const LandingPage = () => {
 
         {/* Hero Content matching the screenshot layout */}
         <div className="max-w-4xl mx-auto text-center pt-16 pb-12">
-          
-          {/* Tags row */}
-          <div className="flex items-center justify-center space-x-4 mb-8 text-xs font-bold uppercase tracking-wider">
-            <div className="flex items-center text-[#4b5563]">
-              <div className="w-2 h-2 bg-primary mr-3"></div>
-              Digital Transformation
-            </div>
-            <span className="bg-[#1e293b] text-white px-3 py-1.5 rounded text-[10px]">Consultancy</span>
-            <span className="bg-[#d1d5db] text-[#4b5563] px-3 py-1.5 rounded text-[10px]">Management</span>
-          </div>
 
           {/* Hero Title */}
           <h1 className="text-5xl md:text-6xl font-medium text-[#1e293b] mb-8 leading-tight">
