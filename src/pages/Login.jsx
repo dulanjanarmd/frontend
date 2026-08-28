@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Building2, ArrowRight, User } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -29,92 +28,112 @@ const Login = () => {
 
   const autofill = (roleEmail) => {
     setEmail(roleEmail);
-    setPassword('password123'); // Password is ignored in mock anyway
+    setPassword('password123');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-card w-full max-w-md p-8 relative z-10 mx-4"
-      >
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
-            <Building2 className="w-8 h-8 text-white" />
+    <div className="min-h-screen flex flex-col bg-slate-900 text-slate-300 relative font-sans">
+      
+      {/* Top Navbar Simulation for Theme */}
+      <header className="bg-slate-200 text-slate-800 rounded-b-xl flex items-center justify-between px-6 py-4 mx-4 md:mx-auto md:w-full md:max-w-7xl shadow-sm">
+        <div className="flex items-center space-x-6">
+          <div className="bg-slate-900 w-10 h-10 rounded-md flex items-center justify-center">
+            {/* Logo Icon simulation */}
+            <div className="w-5 h-5 border-4 border-primary rounded-sm relative">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary rounded-full"></div>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Prismo Platform</h1>
-          <p className="text-slate-500 text-sm mt-1">Sign in to your account</p>
+          <nav className="hidden md:flex space-x-6 text-sm font-medium">
+            <span className="cursor-pointer hover:text-slate-500 transition-colors">Product ▾</span>
+            <span className="cursor-pointer hover:text-slate-500 transition-colors">Solution ▾</span>
+            <span className="cursor-pointer hover:text-slate-500 transition-colors">Resources ▾</span>
+          </nav>
         </div>
-
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-6 text-center border border-red-100">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email Address</label>
-            <input 
-              required 
-              type="email" 
-              className="w-full rounded-lg border border-input bg-background/50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all" 
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input 
-              required 
-              type="password" 
-              className="w-full rounded-lg border border-input bg-background/50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all" 
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <button 
-            disabled={isLoading}
-            type="submit" 
-            className="w-full flex items-center justify-center px-4 py-3 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-medium disabled:opacity-70 mt-2"
-          >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-            ) : (
-              <>Sign In <ArrowRight className="w-4 h-4 ml-2" /></>
-            )}
+        <div className="flex items-center space-x-4 text-sm font-semibold">
+          <span className="cursor-pointer hover:text-slate-500 transition-colors">SIGN IN</span>
+          <button className="bg-primary text-slate-900 px-4 py-2 rounded hover:opacity-90 transition-opacity">
+            BOOK A DEMO
           </button>
-        </form>
-
-        <div className="mt-8 pt-6 border-t border-border">
-          <p className="text-xs text-slate-500 mb-3 text-center font-medium uppercase tracking-wider">Demo Accounts</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            <button onClick={() => autofill('admin@prismo.com')} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs rounded-full transition-colors flex items-center">
-              <User className="w-3 h-3 mr-1" /> Admin
-            </button>
-            <button onClick={() => autofill('ceo@prismo.com')} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs rounded-full transition-colors flex items-center">
-              <User className="w-3 h-3 mr-1" /> CEO
-            </button>
-            <button onClick={() => autofill('pm@prismo.com')} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs rounded-full transition-colors flex items-center">
-              <User className="w-3 h-3 mr-1" /> PM
-            </button>
-            <button onClick={() => autofill('engineer@prismo.com')} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs rounded-full transition-colors flex items-center">
-              <User className="w-3 h-3 mr-1" /> Engineer
-            </button>
-            <button onClick={() => autofill('client@company.com')} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs rounded-full transition-colors flex items-center">
-              <User className="w-3 h-3 mr-1" /> Client
-            </button>
-          </div>
         </div>
-      </motion.div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4">
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="mb-10 text-center">
+            <h1 className="text-4xl font-bold text-white mb-4">visibuild</h1>
+            <p className="text-lg">Welcome back. Please sign in.</p>
+          </div>
+
+          {error && (
+            <div className="bg-red-500/10 text-red-400 p-3 rounded text-sm mb-6 text-center border border-red-500/20">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <input 
+                required 
+                type="email" 
+                className="w-full rounded bg-slate-800 border-none text-white px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-500" 
+                placeholder="Email address..."
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <input 
+                required 
+                type="password" 
+                className="w-full rounded bg-slate-800 border-none text-white px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-500" 
+                placeholder="Password..."
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            <button 
+              disabled={isLoading}
+              type="submit" 
+              className="w-full flex items-center justify-center px-4 py-3 bg-primary text-slate-900 rounded font-bold hover:opacity-90 transition-opacity disabled:opacity-70 mt-2"
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></div>
+              ) : (
+                "SIGN IN"
+              )}
+            </button>
+          </form>
+
+          <div className="mt-10 border-t border-slate-800 pt-6">
+            <p className="text-xs text-slate-500 mb-4 text-center uppercase tracking-widest font-semibold">Demo Accounts</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {['admin@prismo.com', 'ceo@prismo.com', 'pm@prismo.com', 'engineer@prismo.com', 'client@company.com'].map(em => (
+                <button 
+                  key={em}
+                  onClick={() => autofill(em)} 
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded transition-colors text-slate-300"
+                >
+                  {em.split('@')[0]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </main>
+
+      {/* Decorative footer element from theme */}
+      <div className="absolute bottom-8 right-8 text-slate-800 opacity-50 pointer-events-none">
+        <div className="w-48 h-48 border-[12px] border-current rounded-3xl relative rotate-45">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-current rounded-full"></div>
+        </div>
+      </div>
     </div>
   );
 };

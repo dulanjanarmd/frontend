@@ -1,34 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #f8fafc; /* slate-50 */
-  --color-foreground: #020617; /* slate-950 */
+  --color-background: #f1f5f9; /* Light slate/gray from screenshot */
+  --color-foreground: #0f172a; /* Dark slate */
   
   --color-card: #ffffff;
-  --color-card-foreground: #020617;
+  --color-card-foreground: #0f172a;
   
-  --color-primary: #3b82f6; /* blue-500 */
-  --color-primary-foreground: #ffffff;
+  --color-primary: #00fa9a; /* Bright mint green from screenshot */
+  --color-primary-foreground: #022c22; /* Dark green for text on primary */
   
-  --color-secondary: #f1f5f9; /* slate-100 */
-  --color-secondary-foreground: #0f172a; /* slate-900 */
+  --color-secondary: #e2e8f0;
+  --color-secondary-foreground: #0f172a;
   
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b; /* slate-500 */
+  --color-muted: #e2e8f0;
+  --color-muted-foreground: #64748b;
   
-  --color-accent: #f1f5f9;
-  --color-accent-foreground: #0f172a;
+  --color-accent: #1e293b; /* Dark slate from footer */
+  --color-accent-foreground: #f8fafc;
   
-  --color-destructive: #ef4444; /* red-500 */
+  --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
 
-  --color-border: #e2e8f0; /* slate-200 */
-  --color-input: #e2e8f0;
-  --color-ring: #3b82f6;
+  --color-border: #cbd5e1;
+  --color-input: #cbd5e1;
+  --color-ring: #00fa9a;
 
-  --radius-lg: 0.75rem;
-  --radius-md: calc(0.75rem - 2px);
-  --radius-sm: calc(0.75rem - 4px);
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
 }
 
 @layer base {
@@ -42,29 +42,55 @@
   }
 }
 
+.dark {
+  --color-background: #0f172a;
+  --color-foreground: #f8fafc;
+  
+  --color-card: #1e293b;
+  --color-card-foreground: #f8fafc;
+  
+  --color-primary: #00fa9a;
+  --color-primary-foreground: #022c22;
+  
+  --color-secondary: #334155;
+  --color-secondary-foreground: #f8fafc;
+  
+  --color-muted: #334155;
+  --color-muted-foreground: #94a3b8;
+  
+  --color-accent: #334155;
+  --color-accent-foreground: #f8fafc;
+  
+  --color-border: #334155;
+  --color-input: #334155;
+}
+
 .glass {
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .dark .glass {
-  background-color: rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .glass-card {
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border-radius: var(--radius-lg);
 }
 
 .dark .glass-card {
-  background-color: rgba(15, 23, 42, 0.8);
-  border-color: rgba(30, 41, 59, 1);
+  background-color: var(--color-card);
+  border-color: var(--color-border);
+}
+
+/* Specific component overrides for the Visibuild theme */
+.btn-primary {
+  @apply bg-primary text-primary-foreground font-semibold px-4 py-2 rounded shadow-sm hover:opacity-90 transition-opacity;
 }
