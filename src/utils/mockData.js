@@ -91,3 +91,17 @@ export const initialClientApprovals = [
     dateRequested: '2026-08-25'
   }
 ];
+
+export const initialConsultations = [
+  {
+    id: 'c1',
+    clientName: 'Eco Resort Holdings',
+    email: 'contact@ecoresort.com',
+    phone: '+94 77 123 4567',
+    service: 'Construction Management',
+    description: 'Looking to build a 20-cabin eco resort in Ella. We have the designs, need full construction management.',
+    status: 'New Inquiry', // New Inquiry, Proposal Sent, Accepted, Converted
+    dateSubmitted: '2026-08-28',
+    proposalUrl: null
+  }
+];
