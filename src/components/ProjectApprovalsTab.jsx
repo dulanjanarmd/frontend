@@ -1,14 +1,38 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { CheckCircle2, XCircle, FileText, Send, Clock, X } from 'lucide-react';
+import { CheckCircle2, XCircle, FileText, Send, Clock, RotateCcw, Lock, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ApprovalDetailModal from './ApprovalDetailModal';
+
+const STATUS_STYLES = {
+  Pending: 'bg-amber-100 text-amber-700',
+  Approved: 'bg-green-100 text-green-700',
+  Rejected: 'bg-red-100 text-red-700',
+  'Changes Requested': 'bg-orange-100 text-orange-700',
+  Closed: 'bg-slate-100 text-slate-600'
+};
+
+const STATUS_ICON = {
+  Pending: Clock,
+  Approved: CheckCircle2,
+  Rejected: XCircle,
+  'Changes Requested': RotateCcw,
+  Closed: Lock
+};
 
 const ProjectApprovalsTab = ({ projectId, project }) => {
-  const { approvals, updateApproval, addApprovalRequest } = useData();
+  const { approvals, updateApproval, addApprovalRequest, logs } = useData();
   const { currentUser } = useAuth();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ title: '', description: '' });
+  const [selectedApproval, setSelectedApproval] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    dueDate: '',
+    linkedLogIds: []
+  });
 
   const isClient = currentUser?.role === 'client';
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
@@ -16,37 +40,60 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
   // Filter approvals for this project
   const projectApprovals = approvals.filter(a =>
     String(a.projectId) === String(projectId) || a.projectId === `p${projectId}`
+  ).sort((a, b) => new Date(b.dateRequested) - new Date(a.dateRequested));
+
+  // Progress logs for this project (for linking)
+  const projectLogs = logs.filter(l =>
+    String(l.projectId) === String(projectId) || l.projectId === `p${projectId}`
   );
 
   const pendingCount = projectApprovals.filter(a => a.status === 'Pending').length;
+  const changesCount = projectApprovals.filter(a => a.status === 'Changes Requested').length;
+
+  const toggleLog = (logId) => {
+    setFormData(prev => ({
+      ...prev,
+      linkedLogIds: prev.linkedLogIds.includes(logId)
+        ? prev.linkedLogIds.filter(id => id !== logId)
+        : [...prev.linkedLogIds, logId]
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     addApprovalRequest({
       ...formData,
       projectId,
-      documentUrl: '#',
       status: 'Pending',
       feedback: '',
-      dateRequested: new Date().toISOString().split('T')[0]
+      dateRequested: new Date().toISOString().split('T')[0],
+      auditTrail: [{
+        actor: currentUser?.name || 'Project Manager',
+        action: 'Created approval request',
+        timestamp: new Date().toLocaleString(),
+        type: 'create'
+      }]
     });
     setIsModalOpen(false);
-    setFormData({ title: '', description: '' });
+    setFormData({ title: '', description: '', dueDate: '', linkedLogIds: [] });
   };
 
-  const handleAction = (id, status) => {
-    const feedback = window.prompt(`Any feedback for marking this as ${status}?`);
-    updateApproval(id, { status, feedback: feedback || '' });
+  const handleUpdate = (id, updates) => {
+    updateApproval(id, updates);
+    // Refresh the selected approval
+    setSelectedApproval(prev => prev ? { ...prev, ...updates } : null);
   };
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold">Client Approvals</h2>
           <p className="text-sm text-slate-500">
-            {projectApprovals.length} total requests
-            {pendingCount > 0 && <span className="ml-2 text-amber-600 font-semibold">• {pendingCount} pending</span>}
+            {projectApprovals.length} total
+            {pendingCount > 0 && <span className="ml-2 text-amber-600 font-semibold">· {pendingCount} pending</span>}
+            {changesCount > 0 && <span className="ml-2 text-orange-600 font-semibold">· {changesCount} need changes</span>}
           </p>
         </div>
         {isPM && (
@@ -54,81 +101,95 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
             onClick={() => setIsModalOpen(true)}
             className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold"
           >
-            <Send className="w-4 h-4 mr-2" />
+            <Plus className="w-5 h-5 mr-2" />
             Request Approval
           </button>
         )}
       </div>
 
+      {/* Alert banner */}
+      {(pendingCount > 0 || changesCount > 0) && isPM && (
+        <div className={`rounded-lg p-4 border flex items-center gap-3 ${
+          changesCount > 0 ? 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800' :
+          'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800'
+        }`}>
+          <Clock className={`w-5 h-5 shrink-0 ${changesCount > 0 ? 'text-orange-500' : 'text-amber-500'}`} />
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            {changesCount > 0
+              ? `${changesCount} approval${changesCount > 1 ? 's' : ''} need your attention — client requested changes.`
+              : `${pendingCount} approval${pendingCount > 1 ? 's' : ''} awaiting client response.`
+            }
+          </p>
+        </div>
+      )}
+
+      {/* Approvals list */}
       {projectApprovals.length === 0 ? (
         <div className="glass-card p-12 text-center text-slate-500">
           <FileText className="w-12 h-12 mx-auto mb-4 opacity-40" />
           <p className="text-lg font-medium">No approval requests yet.</p>
-          <p className="text-sm mt-1">Create approval requests to get client sign-off on key decisions.</p>
+          <p className="text-sm mt-1">Create requests to get formal client sign-off.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {projectApprovals.map((approval, index) => (
-            <motion.div
-              key={approval.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.07 }}
-              className="glass-card p-6 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center space-x-2 text-sm text-slate-500">
-                    <FileText className="w-4 h-4" />
-                    <span>{approval.dateRequested}</span>
+        <div className="space-y-3">
+          {projectApprovals.map((approval, idx) => {
+            const StatusIcon = STATUS_ICON[approval.status] || Clock;
+            const needsAction = isPM && (approval.status === 'Pending' || approval.status === 'Changes Requested');
+            return (
+              <motion.div
+                key={approval.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                onClick={() => setSelectedApproval(approval)}
+                className={`glass-card p-5 cursor-pointer hover:shadow-md hover:border-primary/30 transition-all group border-l-4 ${
+                  approval.status === 'Changes Requested' ? 'border-l-orange-400' :
+                  approval.status === 'Pending' ? 'border-l-amber-400' :
+                  approval.status === 'Approved' ? 'border-l-green-500' :
+                  approval.status === 'Rejected' ? 'border-l-red-500' :
+                  'border-l-slate-300'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                      <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full flex items-center gap-1 ${STATUS_STYLES[approval.status] || STATUS_STYLES.Pending}`}>
+                        <StatusIcon className="w-3 h-3" />
+                        {approval.status}
+                      </span>
+                      {approval.dueDate && (
+                        <span className="text-xs text-slate-400 flex items-center gap-1">
+                          Due: {approval.dueDate}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1">{approval.title}</h3>
+                    {approval.description && (
+                      <p className="text-sm text-slate-500 line-clamp-1">{approval.description}</p>
+                    )}
+                    {approval.feedback && (
+                      <p className="text-xs text-slate-500 mt-2 italic">
+                        Client: "{approval.feedback}"
+                      </p>
+                    )}
                   </div>
-                  <span className={`px-2.5 py-1 text-xs font-semibold rounded-full flex items-center ${
-                    approval.status === 'Approved' ? 'bg-green-100 text-green-700' :
-                    approval.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                    'bg-amber-100 text-amber-700'
-                  }`}>
-                    {approval.status === 'Pending' && <Clock className="w-3 h-3 mr-1" />}
-                    {approval.status === 'Approved' && <CheckCircle2 className="w-3 h-3 mr-1" />}
-                    {approval.status === 'Rejected' && <XCircle className="w-3 h-3 mr-1" />}
-                    {approval.status}
-                  </span>
-                </div>
-
-                <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">{approval.title}</h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm mb-4">{approval.description}</p>
-
-                {approval.feedback && (
-                  <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-md border border-border mt-2">
-                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Client Feedback:</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">{approval.feedback}</p>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <span className="text-xs text-slate-400">{approval.dateRequested}</span>
+                    {needsAction && (
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full animate-pulse">
+                        Action needed
+                      </span>
+                    )}
+                    <span className="text-primary text-sm font-medium group-hover:underline">View →</span>
                   </div>
-                )}
-              </div>
-
-              {isClient && approval.status === 'Pending' && (
-                <div className="flex space-x-3 pt-4 border-t border-border mt-4">
-                  <button
-                    onClick={() => handleAction(approval.id, 'Approved')}
-                    className="flex-1 flex items-center justify-center px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors text-sm font-medium"
-                  >
-                    <CheckCircle2 className="w-4 h-4 mr-1.5" />
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleAction(approval.id, 'Rejected')}
-                    className="flex-1 flex items-center justify-center px-3 py-2 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 rounded-md transition-colors text-sm font-medium border border-border"
-                  >
-                    <XCircle className="w-4 h-4 mr-1.5" />
-                    Reject
-                  </button>
                 </div>
-              )}
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       )}
 
-      {/* Request Approval Modal */}
+      {/* Create Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -136,32 +197,91 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-card w-full max-w-lg p-6 relative"
+              className="glass-card w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto"
             >
               <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
-              <h2 className="text-xl font-bold mb-2">Request Client Approval</h2>
-              <p className="text-sm text-slate-500 mb-6">For: <span className="font-semibold text-slate-700 dark:text-slate-300">{project.name}</span></p>
+              <h2 className="text-xl font-bold mb-1">Request Client Approval</h2>
+              <p className="text-sm text-slate-500 mb-5">For: <span className="font-semibold text-slate-700 dark:text-slate-300">{project?.name}</span></p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Title <span className="text-red-500">*</span></label>
-                  <input required type="text" placeholder="e.g. Foundation Design Approval" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                  <input
+                    required type="text"
+                    placeholder="e.g. Progress Report – September Week 1"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={formData.title}
+                    onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Description <span className="text-red-500">*</span></label>
-                  <textarea required rows="4" placeholder="Provide context and details for the client to review..." className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <textarea
+                    rows="3"
+                    placeholder="Additional context for the client..."
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
+                    value={formData.description}
+                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Response Due Date</label>
+                  <input
+                    type="date"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={formData.dueDate}
+                    onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
+                  />
+                </div>
+
+                {/* Link progress logs */}
+                {projectLogs.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Link Progress Logs (optional)</label>
+                    <div className="space-y-2 max-h-36 overflow-y-auto border border-border rounded-md p-2 bg-slate-50 dark:bg-slate-900/50">
+                      {projectLogs.map(log => (
+                        <label key={log.id} className="flex items-center gap-2 cursor-pointer py-1 px-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+                          <input
+                            type="checkbox"
+                            checked={formData.linkedLogIds.includes(log.id)}
+                            onChange={() => toggleLog(log.id)}
+                            className="accent-primary"
+                          />
+                          <span className="text-sm text-slate-700 dark:text-slate-300">{log.date}</span>
+                          <span className="text-xs text-slate-500 truncate">{log.workDone}</span>
+                          <span className="ml-auto text-xs text-primary font-semibold shrink-0">+{log.percentageCompleted}%</span>
+                        </label>
+                      ))}
+                    </div>
+                    {formData.linkedLogIds.length > 0 && (
+                      <p className="text-xs text-primary mt-1">{formData.linkedLogIds.length} log{formData.linkedLogIds.length > 1 ? 's' : ''} selected</p>
+                    )}
+                  </div>
+                )}
+
                 <div className="pt-4 flex justify-end space-x-3">
                   <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Send Request</button>
+                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                    <Send className="w-4 h-4" /> Send to Client
+                  </button>
                 </div>
               </form>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+
+      {/* Approval Detail Modal */}
+      {selectedApproval && (
+        <ApprovalDetailModal
+          approval={selectedApproval}
+          project={project}
+          onClose={() => setSelectedApproval(null)}
+          onUpdate={handleUpdate}
+        />
+      )}
     </div>
   );
 };
