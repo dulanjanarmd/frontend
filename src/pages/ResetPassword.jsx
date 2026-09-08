@@ -33,9 +33,9 @@ const ResetPassword = () => {
       <div className="w-full px-4 sm:px-8">
         <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12">
+            <Link to="/" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
               <span className="text-primary font-bold text-xl tracking-tight">Prismo.</span>
-            </div>
+            </Link>
             <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-medium text-[#4b5563]">
               <div className="px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center">Product <span className="ml-1 text-[10px]">▼</span></div>
               <div className="px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center">Solution <span className="ml-1 text-[10px]">▼</span></div>
@@ -59,9 +59,9 @@ const ResetPassword = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-xl min-h-[600px] flex flex-col justify-center bg-white p-12 rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden"
+          className="w-full max-w-xl h-[600px] flex flex-col bg-white p-12 rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden"
         >
-          <div className="mb-10 text-center">
+          <div className="text-center">
             <h1 className="text-4xl font-bold text-slate-900 mb-3 tracking-tight">Reset Password</h1>
             <p className="text-slate-500 text-lg">Enter your email and a new password.</p>
           </div>
@@ -76,7 +76,7 @@ const ResetPassword = () => {
             </div>
           )}
 
-          <form onSubmit={handleReset} className="space-y-4">
+          <form onSubmit={handleReset} className="flex-1 flex flex-col justify-center space-y-6 my-6">
             <div>
               <input 
                 required 
@@ -111,7 +111,7 @@ const ResetPassword = () => {
             </button>
           </form>
 
-          <div className="mt-8 text-center text-sm text-slate-500">
+          <div className="text-center text-sm text-slate-500">
             Remember your password? <Link to="/login" className="text-primary font-bold hover:underline">Sign In</Link>
           </div>
         </motion.div>

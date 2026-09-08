@@ -39,9 +39,9 @@ const LandingPage = () => {
         {/* Navbar */}
         <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12">
+            <Link to="/" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
               <span className="text-primary font-bold text-xl tracking-tight">Prismo.</span>
-            </div>
+            </Link>
             <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-medium text-[#4b5563]">
               <div className="px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center">Product <span className="ml-1 text-[10px]">▼</span></div>
               <div className="px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center">Solution <span className="ml-1 text-[10px]">▼</span></div>
