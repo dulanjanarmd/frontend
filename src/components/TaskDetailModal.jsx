@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import {
   X, User, Calendar, Flag, Tag, ListTodo, CheckCircle2,
-  RotateCcw, Lock, Image as ImageIcon, AlertTriangle
+  RotateCcw, Lock, Image as ImageIcon, AlertTriangle, MessageSquare, Send
 } from 'lucide-react';
 
 const PRIORITY_STYLES = {
@@ -25,6 +25,8 @@ const TaskDetailModal = ({ task, project, onClose }) => {
   const { updateTask, users } = useData();
   const { currentUser } = useAuth();
   const [evidenceUrl, setEvidenceUrl] = useState(task.evidence || '');
+  const [completionComment, setCompletionComment] = useState('');
+  const [newComment, setNewComment] = useState('');
   const [reAssignId, setReAssignId] = useState('');
   const [showReAssign, setShowReAssign] = useState(false);
 
@@ -42,9 +44,44 @@ const TaskDetailModal = ({ task, project, onClose }) => {
   };
 
   const handleEvidenceSubmit = () => {
+    // Evidence is strongly recommended but we can allow it without if needed, 
+    // though the spec says "require evidence" or "forces photo upload (recommended)".
+    // We'll require it for the UI.
     if (!evidenceUrl) return;
-    updateTask(task.id, { evidence: evidenceUrl, status: 'Completed' });
+    
+    const updates = { evidence: evidenceUrl, status: 'Completed' };
+    
+    // Add completion comment as a comment if provided
+    if (completionComment) {
+      const commentObj = {
+        id: Date.now(),
+        text: completionComment,
+        author: currentUser.name,
+        date: new Date().toISOString(),
+        isCompletionNote: true
+      };
+      updates.comments = [...(task.comments || []), commentObj];
+    }
+    
+    updateTask(task.id, updates);
     onClose();
+  };
+
+  const handleAddComment = (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    
+    const commentObj = {
+      id: Date.now(),
+      text: newComment,
+      author: currentUser.name,
+      date: new Date().toISOString()
+    };
+    
+    updateTask(task.id, {
+      comments: [...(task.comments || []), commentObj]
+    });
+    setNewComment('');
   };
 
   const handleReAssign = () => {
@@ -149,18 +186,31 @@ const TaskDetailModal = ({ task, project, onClose }) => {
               ) : (
                 <div>
                   {(isSiteEngineer && isAssigned && task.status === 'In Progress') ? (
-                    <div className="space-y-2">
-                      <input
-                        type="url"
-                        placeholder="Paste image URL as evidence..."
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                        value={evidenceUrl}
-                        onChange={e => setEvidenceUrl(e.target.value)}
-                      />
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-500 mb-1">Evidence Photo URL <span className="text-red-500">*</span></label>
+                        <input
+                          type="url"
+                          placeholder="Paste image URL as evidence..."
+                          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                          value={evidenceUrl}
+                          onChange={e => setEvidenceUrl(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-500 mb-1">Completion Note (Optional)</label>
+                        <textarea
+                          rows="2"
+                          placeholder="Add a note about the completion..."
+                          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
+                          value={completionComment}
+                          onChange={e => setCompletionComment(e.target.value)}
+                        />
+                      </div>
                       <button
                         onClick={handleEvidenceSubmit}
                         disabled={!evidenceUrl}
-                        className="w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                        className="w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50 shadow-sm"
                       >
                         Submit Evidence & Mark Complete
                       </button>
@@ -170,6 +220,47 @@ const TaskDetailModal = ({ task, project, onClose }) => {
                   )}
                 </div>
               )}
+            </div>
+
+            {/* Comments Section */}
+            <div className="border-t border-border pt-5">
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" /> Activity & Comments
+              </h3>
+              
+              <div className="space-y-4 mb-4">
+                {(task.comments && task.comments.length > 0) ? (
+                  task.comments.map((comment) => (
+                    <div key={comment.id} className={`p-3 rounded-lg text-sm ${comment.isCompletionNote ? 'bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800' : 'bg-slate-50 dark:bg-slate-800/50'}`}>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">{comment.author}</span>
+                        <span className="text-xs text-slate-400">{new Date(comment.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
+                      </div>
+                      <p className="text-slate-700 dark:text-slate-300">{comment.text}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-slate-400 italic">No comments yet.</p>
+                )}
+              </div>
+
+              {/* Add Comment Form */}
+              <form onSubmit={handleAddComment} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Type a comment..."
+                  className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                  value={newComment}
+                  onChange={e => setNewComment(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  disabled={!newComment.trim()}
+                  className="px-3 py-2 bg-primary text-white rounded-md transition-colors disabled:opacity-50 hover:bg-blue-600"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </form>
             </div>
 
             {/* Re-assign section (PM only) */}

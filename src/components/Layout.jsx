@@ -11,7 +11,9 @@ import {
   LogOut,
   User,
   LayoutDashboard,
-  Shield
+  Shield,
+  AlertTriangle,
+  Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -36,8 +38,12 @@ const Navbar = () => {
       { name: 'Approvals', path: '/portal/approvals', icon: <MessageSquare className="w-4 h-4 mr-2" /> },
     ],
     site_engineer: [
+      { name: 'Dashboard', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
       { name: 'My Tasks', path: '/portal/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
-      { name: 'Daily Logs', path: '/portal/logs', icon: <Camera className="w-4 h-4 mr-2" /> },
+      { name: 'Submit Daily Progress', path: '/portal/logs', icon: <Camera className="w-4 h-4 mr-2" /> },
+      { name: 'Report Issue', path: '/portal/issues', icon: <AlertTriangle className="w-4 h-4 mr-2" /> },
+      { name: 'My Projects', path: '/portal/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
+      { name: 'Recent Activity', path: '/portal/activity', icon: <Activity className="w-4 h-4 mr-2" /> },
     ],
     client: [
       { name: 'My Project', path: '/portal', icon: <Briefcase className="w-4 h-4 mr-2" /> },
@@ -151,37 +157,6 @@ const Layout = () => {
         <Outlet />
       </main>
 
-      {/* Decorative footer from theme */}
-      <footer className="bg-slate-900 text-slate-400 mt-auto py-12 px-6 overflow-hidden relative">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1 md:col-span-2">
-            <h2 className="text-3xl font-bold text-white mb-2">Prismo Constructions</h2>
-            <p className="text-sm">Digital Transformation Platform for Construction Consultancy</p>
-          </div>
-          <div>
-            <h4 className="text-white font-semibold mb-4">Platform</h4>
-            <ul className="space-y-2 text-sm">
-              <li>Project Management</li>
-              <li>Site Progress</li>
-              <li>Client Approvals</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-sm">
-              <li>Help Centre</li>
-              <li>Contact Us</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Decorative corner element */}
-        <div className="absolute bottom-4 right-4 text-slate-800 opacity-50 pointer-events-none">
-          <div className="w-32 h-32 border-[8px] border-current rounded-2xl relative rotate-45 translate-x-10 translate-y-10">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-current rounded-full"></div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

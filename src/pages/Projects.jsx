@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
-import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const Projects = () => {
   const { projects, updateProject } = useData();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   
+  const isSiteEngineer = currentUser?.role === 'site_engineer';
+
   // Modals state
   const [modalType, setModalType] = useState(null); // 'create', 'edit', 'milestones', 'status'
   const [activeProject, setActiveProject] = useState(null);
@@ -73,15 +77,17 @@ const Projects = () => {
     <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
-          Projects Management
+          {isSiteEngineer ? 'My Projects' : 'Projects Management'}
         </h1>
-        <button 
-          onClick={() => navigate('/portal/projects/new')}
-          className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          New Project
-        </button>
+        {!isSiteEngineer && (
+          <button 
+            onClick={() => navigate('/portal/projects/new')}
+            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            New Project
+          </button>
+        )}
       </div>
 
       <div className="glass-card overflow-hidden">
@@ -126,15 +132,26 @@ const Projects = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end space-x-2">
-                      <button onClick={() => openModal('status', project)} className="p-2 text-slate-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Update Status">
-                        <Activity className="w-4 h-4" />
+                      <button 
+                        onClick={() => navigate(`/portal/projects/${project.id}`)} 
+                        className="px-3 py-1.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md transition-colors flex items-center"
+                      >
+                        View <ArrowRight className="w-4 h-4 ml-1" />
                       </button>
-                      <button onClick={() => openModal('milestones', project)} className="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-md transition-colors" title="Manage Milestones">
-                        <Flag className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors" title="Edit Project">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
+                      
+                      {!isSiteEngineer && (
+                        <>
+                          <button onClick={() => openModal('status', project)} className="p-2 text-slate-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Update Status">
+                            <Activity className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => openModal('milestones', project)} className="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-md transition-colors" title="Manage Milestones">
+                            <Flag className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors" title="Edit Project">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

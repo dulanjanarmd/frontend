@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { ArrowLeft, LayoutDashboard, Flag, CheckSquare, Camera, AlertTriangle, MessageSquare, FolderOpen } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 import ProjectOverviewTab from '../components/ProjectOverviewTab';
 import ProjectMilestonesTab from '../components/ProjectMilestonesTab';
@@ -25,6 +26,14 @@ const ProjectDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { projects } = useData();
+  const { currentUser } = useAuth();
+
+  const isSiteEngineer = currentUser?.role === 'site_engineer';
+
+  // Filter tabs based on role
+  const availableTabs = isSiteEngineer 
+    ? TABS.filter(t => ['overview', 'tasks', 'progress', 'issues'].includes(t.id))
+    : TABS;
 
   const [activeTab, setActiveTab] = useState('overview');
   const [project, setProject] = useState(null);
@@ -96,7 +105,7 @@ const ProjectDetailPage = () => {
 
         {/* Tab bar */}
         <nav className="flex space-x-1 overflow-x-auto scrollbar-none py-1" aria-label="Project tabs">
-          {TABS.map(tab => {
+          {availableTabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (

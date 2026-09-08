@@ -12,6 +12,8 @@ import Tasks from './pages/Tasks';
 import Login from './pages/Login';
 import AdminPortal from './pages/AdminPortal';
 import Consultations from './pages/Consultations';
+import Issues from './pages/Issues';
+import RecentActivityPage from './pages/RecentActivityPage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 
@@ -67,10 +69,12 @@ function App() {
         <Route path="logs" element={<Logs />} />
         <Route path="approvals" element={<Approvals />} />
         <Route path="consultations" element={
-          <RequireAuth allowedRoles={['project_manager', 'ceo', 'admin']}>
+          <RequireAuth allowedRoles={['ceo', 'project_manager']}>
             <Consultations />
           </RequireAuth>
         } />
+        <Route path="issues" element={<Issues />} />
+        <Route path="activity" element={<RecentActivityPage />} />
         <Route path="admin" element={
           <RequireAuth allowedRoles={['admin']}>
             <AdminPortal />

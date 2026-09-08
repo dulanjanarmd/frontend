@@ -155,8 +155,9 @@ const Tasks = () => {
                 <tr>
                   <th className="px-6 py-3 font-medium">Task</th>
                   <th className="px-6 py-3 font-medium">Project</th>
+                  <th className="px-6 py-3 font-medium">Milestone</th>
                   <th className="px-6 py-3 font-medium">Priority</th>
-                  <th className="px-6 py-3 font-medium">Assignee</th>
+                  {!isSiteEngineer && <th className="px-6 py-3 font-medium">Assignee</th>}
                   <th className="px-6 py-3 font-medium">Status</th>
                   <th className="px-6 py-3 font-medium">Due Date</th>
                   <th className="px-6 py-3 font-medium text-right">Action</th>
@@ -200,21 +201,26 @@ const Tasks = () => {
                           </button>
                         ) : '—'}
                       </td>
+                      <td className="px-6 py-4 text-slate-500 text-sm">
+                        {project?.milestones?.find(m => m.id === task.milestoneId)?.name || project?.milestones?.find(m => m.id === task.milestoneId)?.title || '—'}
+                      </td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-0.5 text-xs font-semibold rounded ${PRIORITY_STYLES[task.priority] || ''}`}>
                           {task.priority}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5">
-                          {assignee && (
-                            <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
-                              {assignee.name?.charAt(0)}
-                            </div>
-                          )}
-                          <span className="text-sm text-slate-700 dark:text-slate-300">{assignee?.name || '—'}</span>
-                        </div>
-                      </td>
+                      {!isSiteEngineer && (
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5">
+                            {assignee && (
+                              <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
+                                {assignee.name?.charAt(0)}
+                              </div>
+                            )}
+                            <span className="text-sm text-slate-700 dark:text-slate-300">{assignee?.name || '—'}</span>
+                          </div>
+                        </td>
+                      )}
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${STATUS_STYLES[task.status] || ''}`}>
                           {task.status}

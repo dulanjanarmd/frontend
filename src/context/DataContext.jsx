@@ -19,6 +19,7 @@ export const DataProvider = ({ children }) => {
   const [approvals, setApprovals] = useState([]);
   const [consultations, setConsultations] = useState([]);
   const [users, setUsers] = useState([]);
+  const [issues, setIssues] = useState([]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -131,13 +132,17 @@ export const DataProvider = ({ children }) => {
   const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);
   const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
 
+  const addIssue = (issue) => setIssues([...issues, { ...issue, id: `i${Date.now()}` }]);
+  const updateIssue = (id, updates) => setIssues(issues.map(i => i.id === id ? { ...i, ...updates } : i));
+
   const value = {
     projects, addProject, updateProject,
     tasks, addTask, updateTask,
     logs, addLog,
     approvals, updateApproval, addApprovalRequest,
     consultations, addConsultation, updateConsultation,
-    users
+    users,
+    issues, addIssue, updateIssue
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
