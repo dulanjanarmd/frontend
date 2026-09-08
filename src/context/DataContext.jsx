@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-import { initialProjects, initialTasks, initialLogs, initialClientApprovals, initialConsultations } from '../utils/mockData';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const DataContext = createContext();
 
@@ -12,11 +12,70 @@ export const useData = () => {
 };
 
 export const DataProvider = ({ children }) => {
-  const [projects, setProjects] = useState(initialProjects);
-  const [tasks, setTasks] = useState(initialTasks);
-  const [logs, setLogs] = useState(initialLogs);
-  const [approvals, setApprovals] = useState(initialClientApprovals);
-  const [consultations, setConsultations] = useState(initialConsultations);
+  const { currentUser } = useAuth();
+  const [projects, setProjects] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [logs, setLogs] = useState([]);
+  const [approvals, setApprovals] = useState([]);
+  const [consultations, setConsultations] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    const headers = {
+      'Authorization': `Bearer ${currentUser.token}`,
+      'Content-Type': 'application/json'
+    };
+
+    const loadData = async () => {
+      try {
+        const pRes = await fetch('http://localhost:8080/api/projects', { headers });
+        if (pRes.ok) {
+          const rawP = await pRes.json();
+          setProjects(rawP.map(p => ({
+            ...p,
+            progress: p.progressPercentage,
+            client: p.client?.name || 'Unknown'
+          })));
+        }
+
+        const tRes = await fetch('http://localhost:8080/api/tasks', { headers });
+        if (tRes.ok) {
+          const rawT = await tRes.json();
+          setTasks(rawT.map(t => ({
+            ...t,
+            projectId: `p${t.project?.id}`,
+            assignedTo: `u${t.assignee?.id}`,
+            evidence: t.completionEvidence
+          })));
+        }
+
+        const lRes = await fetch('http://localhost:8080/api/progress', { headers });
+        if (lRes.ok) {
+          const rawL = await lRes.json();
+          setLogs(rawL.map(l => ({
+            ...l,
+            projectId: `p${l.project?.id}`,
+            submittedBy: `u${l.siteEngineer?.id}`
+          })));
+        }
+
+        const aRes = await fetch('http://localhost:8080/api/client/approvals', { headers });
+        if (aRes.ok) {
+          const rawA = await aRes.json();
+          setApprovals(rawA.map(a => ({
+            ...a,
+            projectId: `p${a.project?.id}`,
+            documentUrl: '#'
+          })));
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    };
+
+    loadData();
+  }, [currentUser]);
 
   const addProject = (project) => setProjects([...projects, { ...project, id: `p${Date.now()}` }]);
   const updateProject = (id, updates) => setProjects(projects.map(p => p.id === id ? { ...p, ...updates } : p));
