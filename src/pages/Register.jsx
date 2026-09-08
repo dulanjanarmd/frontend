@@ -60,13 +60,13 @@ const Register = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10 py-12">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-slate-200"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-xl min-h-[600px] flex flex-col justify-center bg-white p-12 rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden"
         >
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Account</h1>
-            <p className="text-slate-500">Join Prismo Constructions Platform</p>
+          <div className="mb-10 text-center">
+            <h1 className="text-4xl font-bold text-slate-900 mb-3 tracking-tight">Create Account</h1>
+            <p className="text-slate-500 text-lg">Join Prismo Constructions Platform</p>
           </div>
 
           {error && (
@@ -80,7 +80,7 @@ const Register = () => {
               <input 
                 required 
                 type="text" 
-                className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
+                className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
                 placeholder="Full Name"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -90,7 +90,7 @@ const Register = () => {
               <input 
                 required 
                 type="email" 
-                className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
+                className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
                 placeholder="Email address"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -100,7 +100,7 @@ const Register = () => {
               <input 
                 required 
                 type="password" 
-                className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
+                className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
                 placeholder="Password"
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
@@ -108,7 +108,7 @@ const Register = () => {
             </div>
             <div>
               <select 
-                className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all"
                 value={formData.role}
                 onChange={(e) => setFormData({...formData, role: e.target.value})}
               >
@@ -121,7 +121,7 @@ const Register = () => {
             <button 
               disabled={isLoading}
               type="submit" 
-              className="w-full flex items-center justify-center px-4 py-3 bg-primary text-primary-foreground rounded font-bold hover:opacity-90 transition-opacity disabled:opacity-70 mt-4 shadow-sm shadow-primary/20"
+              className="w-full flex items-center justify-center px-4 py-4 bg-[#1e293b] text-white rounded-xl font-bold text-lg hover:bg-primary hover:text-[#022c22] transition-colors disabled:opacity-70 mt-6 shadow-md"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
