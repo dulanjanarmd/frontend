@@ -63,7 +63,7 @@ const Issues = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
             Site Issues
           </h1>
           <p className="text-slate-500 mt-1">{openCount} open issues require attention.</p>
@@ -157,7 +157,7 @@ const Issues = () => {
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsAdding(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
+                <button type="button" onClick={() => setIsAdding(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
                 <button type="submit" className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors shadow-lg shadow-red-500/20">Submit Issue</button>
               </div>
             </div>
@@ -199,8 +199,8 @@ const Issues = () => {
                         <span className="text-xs font-medium text-slate-500">{project?.name || 'Project'}</span>
                         <span className="text-xs text-slate-400">{issue.reportedDate}</span>
                       </div>
-                      <h3 className="font-bold text-slate-900 dark:text-slate-100">{issue.title}</h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{issue.description}</p>
+                      <h3 className="font-bold text-slate-900 ">{issue.title}</h3>
+                      <p className="text-sm text-slate-600  mt-1">{issue.description}</p>
                     </div>
                     <button
                       onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
@@ -217,7 +217,7 @@ const Issues = () => {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-border bg-slate-50/50 dark:bg-slate-900/30 px-5 py-4 flex gap-4"
+                      className="border-t border-border bg-slate-50/50  px-5 py-4 flex gap-4"
                     >
                       {issue.photoUrl && (
                         <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0 border border-border">
@@ -226,11 +226,11 @@ const Issues = () => {
                       )}
                       <div className="flex-1">
                         {issue.resolution ? (
-                          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-3">
-                            <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1 flex items-center">
+                          <div className="bg-green-50  border border-green-200  rounded-md p-3">
+                            <p className="text-xs font-semibold text-green-700  mb-1 flex items-center">
                               <MessageSquare className="w-3 h-3 mr-1" /> PM Resolution Note
                             </p>
-                            <p className="text-sm text-green-700 dark:text-green-300">{issue.resolution}</p>
+                            <p className="text-sm text-green-700 ">{issue.resolution}</p>
                           </div>
                         ) : (
                           <p className="text-sm text-slate-500 italic flex items-center gap-2">

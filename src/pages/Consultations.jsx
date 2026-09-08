@@ -61,7 +61,7 @@ const Consultations = () => {
     <div className="space-y-6 relative h-full">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 ">
             Consultations & Inquiries
           </h1>
           <p className="text-slate-500 mt-1">Manage public inquiries, proposals, and convert them to projects.</p>
@@ -73,10 +73,10 @@ const Consultations = () => {
         {columns.map(status => {
           const colConsultations = consultations.filter(c => c.status === status);
           return (
-            <div key={status} className="bg-slate-100 dark:bg-slate-900/50 rounded-xl p-4 min-h-[60vh] border border-border min-w-[300px] w-[320px] flex-shrink-0">
+            <div key={status} className="bg-slate-100  rounded-xl p-4 min-h-[60vh] border border-border min-w-[300px] w-[320px] flex-shrink-0">
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
-                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300">{status}</h3>
-                <span className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs px-2 py-1 rounded-full font-bold">
+                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700 ">{status}</h3>
+                <span className="bg-slate-200  text-slate-600  text-xs px-2 py-1 rounded-full font-bold">
                   {colConsultations.length}
                 </span>
               </div>
@@ -95,7 +95,7 @@ const Consultations = () => {
                       </span>
                       <span className="text-xs text-slate-500">{new Date(c.dateSubmitted).toLocaleDateString()}</span>
                     </div>
-                    <h4 className="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">{c.clientName}</h4>
+                    <h4 className="font-bold text-slate-900  mb-1 group-hover:text-primary transition-colors">{c.clientName}</h4>
                     <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{c.description}</p>
                     
                     {c.proposalUrl && (
@@ -118,11 +118,11 @@ const Consultations = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-slate-900 border border-border w-full max-w-2xl p-6 relative rounded shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="bg-white  border border-border w-full max-w-2xl p-6 relative rounded shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <button 
                 onClick={() => setSelectedConsultation(null)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 :text-slate-200 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -132,38 +132,38 @@ const Consultations = () => {
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">{selectedConsultation.clientName}</h2>
+                  <h2 className="text-xl font-bold text-slate-900 ">{selectedConsultation.clientName}</h2>
                   <p className="text-sm text-slate-500 font-semibold">{selectedConsultation.service}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-6 bg-slate-50 dark:bg-slate-800/50 p-4 rounded border border-border">
-                <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+              <div className="grid grid-cols-2 gap-4 mb-6 bg-slate-50  p-4 rounded border border-border">
+                <div className="flex items-center text-sm text-slate-600 ">
                   <Mail className="w-4 h-4 mr-2 text-slate-400" /> {selectedConsultation.email}
                 </div>
-                <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+                <div className="flex items-center text-sm text-slate-600 ">
                   <Phone className="w-4 h-4 mr-2 text-slate-400" /> {selectedConsultation.phone}
                 </div>
-                <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+                <div className="flex items-center text-sm text-slate-600 ">
                   <User className="w-4 h-4 mr-2 text-slate-400" /> Web Lead
                 </div>
-                <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+                <div className="flex items-center text-sm text-slate-600 ">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-slate-400" /> Status: <span className="font-bold ml-1">{selectedConsultation.status}</span>
                 </div>
               </div>
 
               <div className="mb-6">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2">Inquiry Details</h4>
-                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{selectedConsultation.description}</p>
+                <h4 className="text-sm font-bold text-slate-900  uppercase tracking-wider mb-2">Inquiry Details</h4>
+                <p className="text-slate-600  text-sm leading-relaxed">{selectedConsultation.description}</p>
               </div>
 
               {selectedConsultation.proposalUrl && (
-                <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded flex items-center justify-between">
+                <div className="mb-6 bg-blue-50  border border-blue-200  p-4 rounded flex items-center justify-between">
                   <div className="flex items-center">
                     <FileText className="w-5 h-5 text-blue-500 mr-3" />
                     <div>
-                      <p className="text-sm font-bold text-blue-900 dark:text-blue-100">Proposal Document</p>
-                      <a href={selectedConsultation.proposalUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">{selectedConsultation.proposalUrl}</a>
+                      <p className="text-sm font-bold text-blue-900 ">Proposal Document</p>
+                      <a href={selectedConsultation.proposalUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600  hover:underline">{selectedConsultation.proposalUrl}</a>
                     </div>
                   </div>
                 </div>
@@ -171,12 +171,12 @@ const Consultations = () => {
 
               {selectedConsultation.status === 'New Inquiry' && (
                 <form onSubmit={handleAttachProposal} className="mb-6 border-t border-border pt-6">
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2">Attach Proposal & Budget</h4>
+                  <h4 className="text-sm font-bold text-slate-900  uppercase tracking-wider mb-2">Attach Proposal & Budget</h4>
                   <div className="flex space-x-2">
                     <input 
                       required type="url" 
                       placeholder="Google Drive link or PDF URL" 
-                      className="flex-1 rounded border border-input bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      className="flex-1 rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                       value={proposalUrl}
                       onChange={e => setProposalUrl(e.target.value)}
                     />
@@ -188,7 +188,7 @@ const Consultations = () => {
               )}
 
               {selectedConsultation.status === 'Proposal Sent' && isPM && (
-                <div className="mb-6 border-t border-border pt-6 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-4 rounded">
+                <div className="mb-6 border-t border-border pt-6 flex justify-between items-center bg-slate-50  p-4 rounded">
                   <p className="text-sm font-medium">Has the client accepted the proposal?</p>
                   <button 
                     onClick={() => handleUpdateStatus(selectedConsultation.id, 'Accepted')}
@@ -221,9 +221,9 @@ const Consultations = () => {
               )}
 
               {selectedConsultation.status === 'Pending CEO Approval' && isCEO && (
-                <div className="mb-6 border border-amber-500/50 bg-amber-50 dark:bg-amber-900/10 p-6 rounded text-center">
-                  <h3 className="text-xl font-bold text-amber-700 dark:text-amber-500 mb-2">CEO Approval Required</h3>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">The project manager has requested approval to create this project.</p>
+                <div className="mb-6 border border-amber-500/50 bg-amber-50  p-6 rounded text-center">
+                  <h3 className="text-xl font-bold text-amber-700  mb-2">CEO Approval Required</h3>
+                  <p className="text-slate-600  text-sm mb-6">The project manager has requested approval to create this project.</p>
                   <div className="flex space-x-3 justify-center">
                     <button 
                       onClick={() => handleUpdateStatus(selectedConsultation.id, 'CEO Approved')}
@@ -233,7 +233,7 @@ const Consultations = () => {
                     </button>
                     <button 
                       onClick={() => handleUpdateStatus(selectedConsultation.id, 'Accepted')}
-                      className="flex items-center justify-center px-6 py-2 bg-white dark:bg-slate-800 border border-border text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors font-medium text-sm"
+                      className="flex items-center justify-center px-6 py-2 bg-white  border border-border text-red-500 hover:bg-red-50 :bg-red-900/20 rounded-md transition-colors font-medium text-sm"
                     >
                       <X className="w-4 h-4 mr-2" /> Reject
                     </button>
@@ -242,20 +242,20 @@ const Consultations = () => {
               )}
               
               {selectedConsultation.status === 'Pending CEO Approval' && !isCEO && (
-                <div className="mb-6 border border-amber-500/50 bg-amber-50 dark:bg-amber-900/10 p-4 rounded text-center">
+                <div className="mb-6 border border-amber-500/50 bg-amber-50  p-4 rounded text-center">
                   <ShieldAlert className="w-8 h-8 text-amber-500 mx-auto mb-2" />
-                  <h3 className="font-bold text-amber-700 dark:text-amber-500">Waiting for CEO</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">This project is pending review and approval from the CEO.</p>
+                  <h3 className="font-bold text-amber-700 ">Waiting for CEO</h3>
+                  <p className="text-xs text-slate-600  mt-1">This project is pending review and approval from the CEO.</p>
                 </div>
               )}
 
               {selectedConsultation.status === 'CEO Approved' && isPM && (
-                <div className="mb-6 border border-green-500/50 bg-green-50 dark:bg-green-900/10 p-6 rounded text-center">
-                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="mb-6 border border-green-500/50 bg-green-50  p-6 rounded text-center">
+                  <div className="w-12 h-12 bg-green-100  text-green-600  rounded-full flex items-center justify-center mx-auto mb-3">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-green-700 dark:text-green-500 mb-2">CEO Approved!</h3>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">You have permission to convert this consultation into an active project.</p>
+                  <h3 className="text-xl font-bold text-green-700  mb-2">CEO Approved!</h3>
+                  <p className="text-slate-600  text-sm mb-6">You have permission to convert this consultation into an active project.</p>
                   <button 
                     onClick={() => handleConvertToProject(selectedConsultation)}
                     className="btn-primary flex items-center justify-center mx-auto"

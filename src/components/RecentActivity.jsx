@@ -26,11 +26,11 @@ const RecentActivity = ({ activities }) => {
                 {index !== activities.slice(0, 7).length - 1 && (
                   <div className="absolute top-8 left-4 bottom-0 w-px bg-border -ml-px"></div>
                 )}
-                <div className="relative z-10 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-border flex items-center justify-center shrink-0">
+                <div className="relative z-10 w-8 h-8 rounded-full bg-slate-100  border border-border flex items-center justify-center shrink-0">
                   {getActivityIcon(activity.type)}
                 </div>
                 <div className="ml-4 flex-1">
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <p className="text-sm font-medium text-slate-900 ">
                     {activity.description}
                   </p>
                   <p className="text-xs text-slate-500 mt-1">

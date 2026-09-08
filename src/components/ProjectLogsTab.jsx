@@ -195,7 +195,7 @@ const ProjectLogsTab = ({ projectId }) => {
                   {/* Left: meta */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <span className="font-bold text-slate-900 dark:text-white">{formattedDate}</span>
+                      <span className="font-bold text-slate-900 ">{formattedDate}</span>
                       {log.issues && (
                         <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
                           <AlertTriangle className="w-3 h-3" /> Issue
@@ -203,7 +203,7 @@ const ProjectLogsTab = ({ projectId }) => {
                       )}
                     </div>
 
-                    <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
+                    <p className="text-sm text-slate-600  line-clamp-2 mb-3">
                       {log.workDone}
                     </p>
 
@@ -221,7 +221,7 @@ const ProjectLogsTab = ({ projectId }) => {
                       )}
                       {submitter && (
                         <span className="flex items-center gap-1">
-                          by <strong className="text-slate-700 dark:text-slate-300">{submitter.name}</strong>
+                          by <strong className="text-slate-700 ">{submitter.name}</strong>
                         </span>
                       )}
                     </div>

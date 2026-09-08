@@ -133,10 +133,10 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
                   </span>
                 )}
               </div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{approval.title}</h2>
+              <h2 className="text-xl font-bold text-slate-900  leading-tight">{approval.title}</h2>
               {project && <p className="text-sm text-slate-500 mt-0.5">{project.name}</p>}
             </div>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors shrink-0">
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 :bg-slate-800 rounded-full transition-colors shrink-0">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -149,8 +149,8 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
                 <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                   <FileText className="w-4 h-4" /> Request Details
                 </h3>
-                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-border">
-                  <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{approval.description}</p>
+                <div className="bg-slate-50  rounded-lg p-4 border border-border">
+                  <p className="text-sm text-slate-700  leading-relaxed">{approval.description}</p>
                 </div>
               </div>
             )}
@@ -163,7 +163,7 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
                 </h3>
                 <div className="space-y-2">
                   {linkedLogs.map(log => (
-                    <div key={log.id} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-border text-sm">
+                    <div key={log.id} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50  border border-border text-sm">
                       <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
                       <span className="font-medium">{log.date}</span>
                       <span className="text-slate-500 truncate">{log.workDone}</span>
@@ -177,24 +177,24 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
             {/* Client feedback (if responded) */}
             {approval.feedback && (
               <div className={`rounded-lg p-4 border ${
-                approval.status === 'Approved' ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' :
-                approval.status === 'Rejected' ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' :
-                'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
+                approval.status === 'Approved' ? 'bg-green-50 border-green-200  ' :
+                approval.status === 'Rejected' ? 'bg-red-50 border-red-200  ' :
+                'bg-orange-50 border-orange-200  '
               }`}>
-                <p className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                <p className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-600  flex items-center gap-1">
                   <MessageSquare className="w-3 h-3" /> Client Feedback
                 </p>
-                <p className="text-sm text-slate-700 dark:text-slate-300">{approval.feedback}</p>
+                <p className="text-sm text-slate-700 ">{approval.feedback}</p>
               </div>
             )}
 
             {/* PM Reply (if exists) */}
             {approval.pmReply && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <p className="text-xs font-bold uppercase tracking-wider mb-1 text-blue-700 dark:text-blue-400 flex items-center gap-1">
+              <div className="bg-blue-50  border border-blue-200  rounded-lg p-4">
+                <p className="text-xs font-bold uppercase tracking-wider mb-1 text-blue-700  flex items-center gap-1">
                   <Send className="w-3 h-3" /> PM Reply
                 </p>
-                <p className="text-sm text-slate-700 dark:text-slate-300">{approval.pmReply}</p>
+                <p className="text-sm text-slate-700 ">{approval.pmReply}</p>
               </div>
             )}
 
@@ -213,8 +213,8 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
                         <div className="w-2 h-2 rounded-full bg-white" />
                       </div>
                       <div className="flex-1 pb-1">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{entry.actor}</p>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">{entry.action}</p>
+                        <p className="text-sm font-semibold text-slate-900 ">{entry.actor}</p>
+                        <p className="text-sm text-slate-600 ">{entry.action}</p>
                         <p className="text-xs text-slate-400 mt-0.5">{entry.timestamp}</p>
                       </div>
                     </div>
@@ -225,11 +225,11 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
           </div>
 
           {/* Footer — Actions */}
-          <div className="sticky bottom-0 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md px-6 py-5 border-t border-border space-y-3">
+          <div className="sticky bottom-0 bg-slate-50/80  backdrop-blur-md px-6 py-5 border-t border-border space-y-3">
             {/* CLIENT: Respond */}
             {isClient && approval.status === 'Pending' && (
               <div className="space-y-3">
-                <h3 className="text-sm font-bold text-slate-600 dark:text-slate-400">Your Response</h3>
+                <h3 className="text-sm font-bold text-slate-600 ">Your Response</h3>
                 <div className="grid grid-cols-3 gap-2">
                   {['Approved', 'Rejected', 'Changes Requested'].map(decision => (
                     <button
@@ -240,7 +240,7 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
                           ? decision === 'Approved' ? 'bg-green-500 text-white border-green-500' :
                             decision === 'Rejected' ? 'bg-red-500 text-white border-red-500' :
                             'bg-orange-500 text-white border-orange-500'
-                          : 'border-border text-slate-600 dark:text-slate-400 hover:border-slate-400'
+                          : 'border-border text-slate-600  hover:border-slate-400'
                       }`}
                     >
                       {decision === 'Approved' && <CheckCircle2 className="w-3.5 h-3.5 inline mr-1" />}
@@ -285,13 +285,13 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
                       <button onClick={handlePmReply} disabled={!pmReply.trim()} className="flex-1 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-blue-600 transition-colors disabled:opacity-40">
                         Send Reply
                       </button>
-                      <button onClick={() => setShowPmReply(false)} className="px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                      <button onClick={() => setShowPmReply(false)} className="px-4 py-2 text-sm hover:bg-slate-100 :bg-slate-800 rounded-lg transition-colors">
                         Cancel
                       </button>
                     </div>
                   </>
                 ) : (
-                  <button onClick={() => setShowPmReply(true)} className="w-full py-2.5 border-2 border-orange-400 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                  <button onClick={() => setShowPmReply(true)} className="w-full py-2.5 border-2 border-orange-400 text-orange-600 hover:bg-orange-50 :bg-orange-900/20 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2">
                     <RotateCcw className="w-4 h-4" /> Reply to Changes Request
                   </button>
                 )}
@@ -302,14 +302,14 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
             {isPM && ['Approved', 'Rejected', 'Changes Requested'].includes(approval.status) && (
               <button
                 onClick={handleClose}
-                className="w-full py-2.5 bg-slate-700 hover:bg-slate-800 dark:bg-slate-600 dark:hover:bg-slate-500 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-slate-700 hover:bg-slate-800  :bg-slate-500 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
               >
                 <Lock className="w-4 h-4" /> Close Approval
               </button>
             )}
 
             {approval.status === 'Closed' && (
-              <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 font-semibold py-2">
+              <div className="flex items-center justify-center gap-2 text-green-600  font-semibold py-2">
                 <Lock className="w-4 h-4" /> Approval Closed
               </div>
             )}

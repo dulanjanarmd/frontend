@@ -77,14 +77,14 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
           <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-md px-6 py-5 border-b border-border flex items-start justify-between gap-4">
             <div>
               <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Daily Progress Log</p>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              <h2 className="text-xl font-bold text-slate-900 ">
                 {new Date(log.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </h2>
               <p className="text-sm text-slate-500 mt-0.5">
                 Submitted by {submitter?.name || log.submittedBy || 'Site Engineer'}
               </p>
             </div>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors shrink-0">
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 :bg-slate-800 rounded-full transition-colors shrink-0">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -119,8 +119,8 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
               <h3 className="flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
                 <Wrench className="w-4 h-4" /> Work Completed
               </h3>
-              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-border">
-                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{log.workDone}</p>
+              <div className="bg-slate-50  rounded-lg p-4 border border-border">
+                <p className="text-slate-700  text-sm leading-relaxed">{log.workDone}</p>
               </div>
             </div>
 
@@ -140,8 +140,8 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
                 <h3 className="flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
                   <AlertTriangle className="w-4 h-4 text-red-500" /> Reported Issue
                 </h3>
-                <div className="border border-red-200 dark:border-red-900/50 rounded-lg overflow-hidden">
-                  <div className="bg-red-50 dark:bg-red-950/20 p-4 flex items-start justify-between gap-3">
+                <div className="border border-red-200  rounded-lg overflow-hidden">
+                  <div className="bg-red-50  p-4 flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${SEVERITY_STYLES['Medium']}`}>
@@ -151,7 +151,7 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
                           {getIssueStatus(log.id, 'Open')}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-700 dark:text-slate-300">{log.issues}</p>
+                      <p className="text-sm text-slate-700 ">{log.issues}</p>
                     </div>
                     {isPM && getIssueStatus(log.id, 'Open') !== 'Resolved' && (
                       <button
@@ -185,12 +185,12 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
                       <div className="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0">
                         {c.author?.charAt(0)}
                       </div>
-                      <div className="flex-1 bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 border border-border">
+                      <div className="flex-1 bg-slate-50  rounded-lg p-3 border border-border">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{c.author}</span>
+                          <span className="text-xs font-bold text-slate-700 ">{c.author}</span>
                           <span className="text-xs text-slate-400">{c.timestamp}</span>
                         </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">{c.text}</p>
+                        <p className="text-sm text-slate-600 ">{c.text}</p>
                       </div>
                     </div>
                   ))

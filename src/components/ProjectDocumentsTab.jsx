@@ -140,7 +140,7 @@ const ProjectDocumentsTab = ({ project }) => {
               />
             </div>
             <div className="flex justify-end space-x-3 pt-2">
-              <button type="button" onClick={() => setIsUploading(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
+              <button type="button" onClick={() => setIsUploading(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
               <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Add Document</button>
             </div>
           </form>
@@ -173,7 +173,7 @@ const ProjectDocumentsTab = ({ project }) => {
           </h3>
           <div className="glass-card overflow-hidden">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-border">
+              <thead className="bg-slate-50  border-b border-border">
                 <tr>
                   <th className="px-6 py-3 font-medium text-slate-500">Name</th>
                   <th className="px-6 py-3 font-medium text-slate-500">Note</th>
@@ -188,24 +188,24 @@ const ProjectDocumentsTab = ({ project }) => {
                     key={doc.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                    className="hover:bg-slate-50/50 :bg-slate-800/30 transition-colors"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
                         <FileIcon name={doc.name} />
-                        <span className="font-medium text-slate-900 dark:text-slate-100">{doc.name}</span>
+                        <span className="font-medium text-slate-900 ">{doc.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-slate-500 text-xs max-w-[200px] truncate">{doc.note || '—'}</td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{doc.uploadedBy}</td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">{doc.uploadedAt}</td>
+                    <td className="px-6 py-4 text-slate-600 ">{doc.uploadedBy}</td>
+                    <td className="px-6 py-4 text-slate-600  whitespace-nowrap">{doc.uploadedAt}</td>
                     <td className="px-6 py-4">
                       <div className="flex justify-end space-x-2">
                         <a
                           href={doc.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 text-slate-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
+                          className="p-1.5 text-slate-500 hover:text-primary hover:bg-blue-50 :bg-blue-900/30 rounded-md transition-colors"
                           title="Download"
                         >
                           <Download className="w-4 h-4" />
@@ -213,7 +213,7 @@ const ProjectDocumentsTab = ({ project }) => {
                         {isPM && (
                           <button
                             onClick={() => handleDelete(doc.id)}
-                            className="p-1.5 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                            className="p-1.5 text-slate-500 hover:text-red-500 hover:bg-red-50 :bg-red-900/20 rounded-md transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />

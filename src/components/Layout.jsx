@@ -55,7 +55,7 @@ const Navbar = () => {
   const roleNav = currentUser ? navItems[currentUser.role] : [];
 
   return (
-    <header className="bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-b-xl flex flex-col md:flex-row md:items-center justify-between px-6 py-4 mx-4 md:mx-auto md:w-full md:max-w-7xl shadow-sm relative z-50">
+    <header className="bg-slate-200  text-slate-800  rounded-b-xl flex flex-col md:flex-row md:items-center justify-between px-6 py-4 mx-4 md:mx-auto md:w-full md:max-w-7xl shadow-sm relative z-50">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <div className="bg-slate-900 w-10 h-10 rounded-md flex items-center justify-center">
@@ -66,7 +66,7 @@ const Navbar = () => {
           </div>
         </div>
         <button 
-          className="md:hidden text-slate-600 dark:text-slate-300"
+          className="md:hidden text-slate-600 "
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -82,7 +82,7 @@ const Navbar = () => {
             className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
               location.pathname === item.path 
                 ? 'text-primary' 
-                : 'hover:text-slate-500 dark:hover:text-slate-400'
+                : 'hover:text-slate-500 :text-slate-400'
             }`}
           >
             {item.icon}
@@ -92,7 +92,7 @@ const Navbar = () => {
       </nav>
 
       <div className="hidden md:flex items-center space-x-4 text-sm font-semibold">
-        <div className="flex items-center text-slate-600 dark:text-slate-400 mr-2">
+        <div className="flex items-center text-slate-600  mr-2">
           <User className="w-4 h-4 mr-2" />
           <span className="font-medium text-xs">{currentUser?.name}</span>
         </div>
@@ -122,15 +122,15 @@ const Navbar = () => {
                 className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
                   location.pathname === item.path 
                     ? 'text-primary' 
-                    : 'text-slate-600 dark:text-slate-400'
+                    : 'text-slate-600 '
                 }`}
               >
                 {item.icon}
                 {item.name}
               </Link>
             ))}
-            <div className="border-t border-slate-300 dark:border-slate-700 pt-4 flex items-center justify-between px-4">
-               <div className="flex items-center text-slate-600 dark:text-slate-400">
+            <div className="border-t border-slate-300  pt-4 flex items-center justify-between px-4">
+               <div className="flex items-center text-slate-600 ">
                 <User className="w-4 h-4 mr-2" />
                 <span className="font-medium text-xs">{currentUser?.name}</span>
               </div>
@@ -151,7 +151,7 @@ const Navbar = () => {
 
 const Layout = () => {
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-300 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-100  transition-colors duration-300 flex flex-col font-sans">
       <Navbar />
       
       <main className="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto mt-4 md:mt-8">

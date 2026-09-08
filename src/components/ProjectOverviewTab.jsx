@@ -9,7 +9,7 @@ const SummaryCard = ({ icon: Icon, label, value, colorClass }) => (
       <Icon className="w-5 h-5" />
     </div>
     <div>
-      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="text-xs font-medium text-slate-500 ">{label}</p>
       <p className="text-2xl font-bold">{value}</p>
     </div>
   </div>
@@ -98,25 +98,25 @@ const ProjectOverviewTab = ({ project }) => {
           icon={CheckSquare}
           label="Total Tasks"
           value={projectTasks.length}
-          colorClass="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400"
+          colorClass="bg-blue-100  text-blue-600 "
         />
         <SummaryCard
           icon={CheckSquare}
           label="Completed Tasks"
           value={completedTasks}
-          colorClass="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400"
+          colorClass="bg-green-100  text-green-600 "
         />
         <SummaryCard
           icon={AlertTriangle}
           label="Open Issues"
           value={openIssues}
-          colorClass="bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400"
+          colorClass="bg-red-100  text-red-600 "
         />
         <SummaryCard
           icon={Clock}
           label="Pending Approvals"
           value={pendingApprovals}
-          colorClass="bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400"
+          colorClass="bg-amber-100  text-amber-600 "
         />
       </div>
 
@@ -129,7 +129,7 @@ const ProjectOverviewTab = ({ project }) => {
               <h2 className="text-xl font-bold">Project Details</h2>
               <button
                 onClick={() => openModal('edit')}
-                className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors"
+                className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 :bg-indigo-900/30 rounded-md transition-colors"
                 title="Edit Details"
               >
                 <Edit2 className="w-4 h-4" />
@@ -138,7 +138,7 @@ const ProjectOverviewTab = ({ project }) => {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-slate-500 mb-1">Description</p>
-                <p className="text-slate-800 dark:text-slate-200 text-sm leading-relaxed">{project.description || 'No description provided.'}</p>
+                <p className="text-slate-800  text-sm leading-relaxed">{project.description || 'No description provided.'}</p>
               </div>
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div>
@@ -175,7 +175,7 @@ const ProjectOverviewTab = ({ project }) => {
               </h2>
               <button
                 onClick={() => openModal('status')}
-                className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
+                className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 :bg-blue-900/30 rounded-md transition-colors"
                 title="Update Status"
               >
                 <Edit2 className="w-4 h-4" />
@@ -185,7 +185,7 @@ const ProjectOverviewTab = ({ project }) => {
               <div>
                 <p className="text-sm text-slate-500 mb-2">Overall Progress</p>
                 <div className="flex items-center space-x-4">
-                  <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-3">
+                  <div className="flex-1 bg-slate-200  rounded-full h-3">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${project.progress}%` }}
@@ -215,16 +215,16 @@ const ProjectOverviewTab = ({ project }) => {
                     <div className="absolute top-7 left-3.5 bottom-0 w-px bg-border" />
                   )}
                   <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
-                    a.type === 'task' ? 'bg-green-100 dark:bg-green-900/50' :
-                    a.type === 'approval' ? 'bg-amber-100 dark:bg-amber-900/50' :
-                    'bg-blue-100 dark:bg-blue-900/50'
+                    a.type === 'task' ? 'bg-green-100 ' :
+                    a.type === 'approval' ? 'bg-amber-100 ' :
+                    'bg-blue-100 '
                   }`}>
                     {a.type === 'task' && <CheckSquare className="w-3 h-3 text-green-600" />}
                     {a.type === 'approval' && <Clock className="w-3 h-3 text-amber-600" />}
                     {a.type === 'log' && <Activity className="w-3 h-3 text-blue-600" />}
                   </div>
                   <div className="ml-3 flex-1">
-                    <p className="text-sm text-slate-700 dark:text-slate-300">{a.text}</p>
+                    <p className="text-sm text-slate-700 ">{a.text}</p>
                     {a.date && <p className="text-xs text-slate-400 mt-0.5">{a.date}</p>}
                   </div>
                 </div>
@@ -271,7 +271,7 @@ const ProjectOverviewTab = ({ project }) => {
                   <textarea rows="3" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
+                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
                   <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Save Changes</button>
                 </div>
               </form>
@@ -300,7 +300,7 @@ const ProjectOverviewTab = ({ project }) => {
                   <div className="text-center font-bold text-primary mt-1">{statusData.progress}%</div>
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
+                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
                   <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Update</button>
                 </div>
               </form>

@@ -48,7 +48,7 @@ const ProjectTable = ({ projects }) => {
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 border-b border-border">
+          <thead className="bg-slate-50  text-slate-500 border-b border-border">
             <tr>
               <th className="px-6 py-4 font-medium">Project Name</th>
               <th className="px-6 py-4 font-medium">Client</th>
@@ -63,11 +63,11 @@ const ProjectTable = ({ projects }) => {
             {filteredProjects.map(project => (
               <tr 
                 key={project.id} 
-                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                className="hover:bg-slate-50/50 :bg-slate-800/50 transition-colors cursor-pointer"
                 onClick={() => navigate(`/portal/projects/${project.id}`)}
               >
-                <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-100">{project.name}</td>
-                <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{project.client}</td>
+                <td className="px-6 py-4 font-bold text-slate-900 ">{project.name}</td>
+                <td className="px-6 py-4 text-slate-600 ">{project.client}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2.5 py-1 text-xs font-semibold rounded-full w-fit whitespace-nowrap ${
                     project.status === 'Completed' ? 'bg-green-100 text-green-700' :
@@ -79,14 +79,14 @@ const ProjectTable = ({ projects }) => {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-2">
-                    <div className="w-24 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                    <div className="w-24 bg-slate-200  rounded-full h-2">
                       <div className="bg-primary h-2 rounded-full" style={{ width: `${project.progress}%` }}></div>
                     </div>
                     <span className="text-xs text-slate-500 font-medium">{project.progress}%</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">{project.startDate}</td>
-                <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">{project.endDate}</td>
+                <td className="px-6 py-4 text-slate-600  whitespace-nowrap">{project.startDate}</td>
+                <td className="px-6 py-4 text-slate-600  whitespace-nowrap">{project.endDate}</td>
                 <td className="px-6 py-4 text-right">
                   <button 
                     onClick={(e) => {

@@ -187,10 +187,10 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
               {formData.photos.length > 0 && (
                 <div className="space-y-3 mb-4">
                   {formData.photos.map((p, idx) => (
-                    <div key={idx} className="flex items-center space-x-3 bg-slate-50 dark:bg-slate-800 p-2 rounded border border-border">
+                    <div key={idx} className="flex items-center space-x-3 bg-slate-50  p-2 rounded border border-border">
                       <img src={p.url} alt={p.caption} className="w-12 h-12 object-cover rounded" />
                       <p className="flex-1 text-sm truncate">{p.caption}</p>
-                      <button type="button" onClick={() => removePhoto(idx)} className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded">
+                      <button type="button" onClick={() => removePhoto(idx)} className="p-1 text-red-500 hover:bg-red-100 :bg-red-900/30 rounded">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -219,7 +219,7 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
                   type="button"
                   onClick={handleAddPhoto}
                   disabled={!newPhoto.url}
-                  className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-slate-200  text-slate-700  rounded-md font-medium hover:bg-slate-300 :bg-slate-600 transition-colors disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -227,7 +227,7 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
             </div>
 
             <div className="pt-4 flex justify-end space-x-3 border-t border-border mt-6">
-              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">
                 Cancel
               </button>
               <button type="submit" className="px-4 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors shadow-lg shadow-blue-500/30">

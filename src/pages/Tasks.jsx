@@ -60,7 +60,7 @@ const Tasks = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
             {isSiteEngineer ? 'My Tasks' : 'Task Management'}
           </h1>
           <p className="text-slate-500 mt-1">{displayTasks.length} tasks shown</p>
@@ -151,7 +151,7 @@ const Tasks = () => {
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-border text-slate-500">
+              <thead className="bg-slate-50  border-b border-border text-slate-500">
                 <tr>
                   <th className="px-6 py-3 font-medium">Task</th>
                   <th className="px-6 py-3 font-medium">Project</th>
@@ -177,14 +177,14 @@ const Tasks = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: idx * 0.03 }}
-                      className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${needsReview ? 'bg-amber-50/40 dark:bg-amber-900/10' : ''}`}
+                      className={`hover:bg-slate-50/50 :bg-slate-800/30 transition-colors ${needsReview ? 'bg-amber-50/40 ' : ''}`}
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-start gap-2">
                           {needsReview && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" title="Needs PM review" />}
                           {task.status === 'Closed' && <Lock className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />}
                           <div>
-                            <p className="font-semibold text-slate-900 dark:text-slate-100">{task.title}</p>
+                            <p className="font-semibold text-slate-900 ">{task.title}</p>
                             {task.description && (
                               <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{task.description}</p>
                             )}
@@ -217,7 +217,7 @@ const Tasks = () => {
                                 {assignee.name?.charAt(0)}
                               </div>
                             )}
-                            <span className="text-sm text-slate-700 dark:text-slate-300">{assignee?.name || '—'}</span>
+                            <span className="text-sm text-slate-700 ">{assignee?.name || '—'}</span>
                           </div>
                         </td>
                       )}

@@ -145,7 +145,7 @@ const ReportIssueModal = ({ isOpen, onClose, defaultProjectId = '', assignedProj
                 onChange={e => setFormData({ ...formData, photoUrl: e.target.value })}
               />
               {formData.photoUrl && (
-                <div className="mt-2 h-32 rounded-md overflow-hidden bg-slate-100 dark:bg-slate-800 border border-border inline-block relative">
+                <div className="mt-2 h-32 rounded-md overflow-hidden bg-slate-100  border border-border inline-block relative">
                   <img src={formData.photoUrl} alt="Preview" className="h-full w-auto object-cover" />
                   <button
                     type="button"
@@ -159,7 +159,7 @@ const ReportIssueModal = ({ isOpen, onClose, defaultProjectId = '', assignedProj
             </div>
 
             <div className="pt-4 flex justify-end space-x-3 border-t border-border mt-6">
-              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">
                 Cancel
               </button>
               <button type="submit" className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors shadow-lg shadow-red-500/30">

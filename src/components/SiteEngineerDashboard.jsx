@@ -98,7 +98,7 @@ const SiteEngineerDashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
             Good Morning, {currentUser?.name}
           </h1>
           <p className="text-slate-500 mt-1">{todayFormatted}</p>
@@ -110,8 +110,8 @@ const SiteEngineerDashboard = () => {
         <div className="glass-card p-5 border-l-4 border-l-blue-500">
           <p className="text-sm font-semibold text-slate-500 mb-1">My Open Tasks</p>
           <div className="flex items-center justify-between">
-            <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">{openTasks.length}</p>
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-full text-blue-500">
+            <p className="text-3xl font-bold text-slate-800 ">{openTasks.length}</p>
+            <div className="p-2 bg-blue-50  rounded-full text-blue-500">
               <CheckSquare className="w-5 h-5" />
             </div>
           </div>
@@ -120,8 +120,8 @@ const SiteEngineerDashboard = () => {
         <div className="glass-card p-5 border-l-4 border-l-orange-500">
           <p className="text-sm font-semibold text-slate-500 mb-1">Due Today</p>
           <div className="flex items-center justify-between">
-            <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">{tasksDueToday}</p>
-            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-full text-orange-500">
+            <p className="text-3xl font-bold text-slate-800 ">{tasksDueToday}</p>
+            <div className="p-2 bg-orange-50  rounded-full text-orange-500">
               <Calendar className="w-5 h-5" />
             </div>
           </div>
@@ -130,8 +130,8 @@ const SiteEngineerDashboard = () => {
         <div className="glass-card p-5 border-l-4 border-l-green-500">
           <p className="text-sm font-semibold text-slate-500 mb-1">Logs This Week</p>
           <div className="flex items-center justify-between">
-            <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">{logsThisWeek}</p>
-            <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-full text-green-500">
+            <p className="text-3xl font-bold text-slate-800 ">{logsThisWeek}</p>
+            <div className="p-2 bg-green-50  rounded-full text-green-500">
               <Camera className="w-5 h-5" />
             </div>
           </div>
@@ -140,8 +140,8 @@ const SiteEngineerDashboard = () => {
         <div className="glass-card p-5 border-l-4 border-l-red-500">
           <p className="text-sm font-semibold text-slate-500 mb-1">Open Issues</p>
           <div className="flex items-center justify-between">
-            <p className="text-3xl font-bold text-slate-800 dark:text-slate-100">{openIssuesCount}</p>
-            <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-full text-red-500">
+            <p className="text-3xl font-bold text-slate-800 ">{openIssuesCount}</p>
+            <div className="p-2 bg-red-50  rounded-full text-red-500">
               <AlertTriangle className="w-5 h-5" />
             </div>
           </div>
@@ -191,7 +191,7 @@ const SiteEngineerDashboard = () => {
           <div className="glass-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-border text-slate-500">
+                <thead className="bg-slate-50  border-b border-border text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-medium">Task Title</th>
                     <th className="px-4 py-3 font-medium">Project</th>
@@ -205,9 +205,9 @@ const SiteEngineerDashboard = () => {
                   {openTasks.slice(0, 5).map(task => {
                     const project = projects.find(p => p.id === task.projectId);
                     return (
-                      <tr key={task.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                        <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{task.title}</td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{project?.name || '—'}</td>
+                      <tr key={task.id} className="hover:bg-slate-50/50 :bg-slate-800/30 transition-colors">
+                        <td className="px-4 py-3 font-medium text-slate-900 ">{task.title}</td>
+                        <td className="px-4 py-3 text-slate-600 ">{project?.name || '—'}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 text-xs font-semibold rounded-md border ${
                             task.priority === 'High' ? 'bg-red-50 text-red-700 border-red-200' :
@@ -218,11 +218,11 @@ const SiteEngineerDashboard = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="font-semibold text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                          <span className="font-semibold text-xs uppercase tracking-wider text-slate-600 ">
                             {task.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{task.dueDate || '—'}</td>
+                        <td className="px-4 py-3 text-slate-600 ">{task.dueDate || '—'}</td>
                         <td className="px-4 py-3 text-right">
                           <button onClick={() => navigate('/portal/tasks')} className="text-primary hover:text-primary/80 font-semibold flex items-center justify-end gap-1 ml-auto">
                             View <ChevronRight className="w-3 h-3" />

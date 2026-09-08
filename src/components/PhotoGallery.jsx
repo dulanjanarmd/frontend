@@ -48,7 +48,7 @@ const PhotoGallery = ({ photos = [] }) => {
           return (
             <div
               key={idx}
-              className="group relative aspect-video rounded-lg overflow-hidden border border-border cursor-pointer bg-slate-100 dark:bg-slate-800"
+              className="group relative aspect-video rounded-lg overflow-hidden border border-border cursor-pointer bg-slate-100 "
               onClick={() => setLightboxIdx(idx)}
             >
               <img

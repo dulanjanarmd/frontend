@@ -112,9 +112,9 @@ const TaskDetailModal = ({ task, project, onClose }) => {
                   {task.priority} Priority
                 </span>
               </div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{task.title}</h2>
+              <h2 className="text-xl font-bold text-slate-900  leading-tight">{task.title}</h2>
             </div>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors shrink-0">
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 :bg-slate-800 rounded-full transition-colors shrink-0">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -125,7 +125,7 @@ const TaskDetailModal = ({ task, project, onClose }) => {
             {task.description && (
               <div>
                 <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Description</h3>
-                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{task.description}</p>
+                <p className="text-slate-700  text-sm leading-relaxed">{task.description}</p>
               </div>
             )}
 
@@ -179,7 +179,7 @@ const TaskDetailModal = ({ task, project, onClose }) => {
                     className="w-full object-cover max-h-48"
                     onError={e => { e.target.style.display = 'none'; }}
                   />
-                  <div className="p-2 bg-green-50 dark:bg-green-900/20 text-xs text-green-700 dark:text-green-400 font-medium flex items-center gap-1">
+                  <div className="p-2 bg-green-50  text-xs text-green-700  font-medium flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" /> Evidence submitted
                   </div>
                 </div>
@@ -231,12 +231,12 @@ const TaskDetailModal = ({ task, project, onClose }) => {
               <div className="space-y-4 mb-4">
                 {(task.comments && task.comments.length > 0) ? (
                   task.comments.map((comment) => (
-                    <div key={comment.id} className={`p-3 rounded-lg text-sm ${comment.isCompletionNote ? 'bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800' : 'bg-slate-50 dark:bg-slate-800/50'}`}>
+                    <div key={comment.id} className={`p-3 rounded-lg text-sm ${comment.isCompletionNote ? 'bg-green-50  border border-green-200 ' : 'bg-slate-50 '}`}>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold text-slate-900 dark:text-slate-100">{comment.author}</span>
+                        <span className="font-semibold text-slate-900 ">{comment.author}</span>
                         <span className="text-xs text-slate-400">{new Date(comment.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
                       </div>
-                      <p className="text-slate-700 dark:text-slate-300">{comment.text}</p>
+                      <p className="text-slate-700 ">{comment.text}</p>
                     </div>
                   ))
                 ) : (
@@ -282,7 +282,7 @@ const TaskDetailModal = ({ task, project, onClose }) => {
                     <button onClick={handleReAssign} disabled={!reAssignId} className="px-3 py-2 bg-primary text-white rounded-md text-sm font-medium disabled:opacity-50 hover:bg-blue-600 transition-colors">
                       Assign
                     </button>
-                    <button onClick={() => setShowReAssign(false)} className="px-3 py-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md text-sm transition-colors">
+                    <button onClick={() => setShowReAssign(false)} className="px-3 py-2 text-slate-500 hover:bg-slate-100 :bg-slate-800 rounded-md text-sm transition-colors">
                       Cancel
                     </button>
                   </div>
@@ -299,7 +299,7 @@ const TaskDetailModal = ({ task, project, onClose }) => {
           </div>
 
           {/* Footer Actions */}
-          <div className="p-6 border-t border-border bg-slate-50/50 dark:bg-slate-900/30 sticky bottom-0">
+          <div className="p-6 border-t border-border bg-slate-50/50  sticky bottom-0">
             {/* Site Engineer actions */}
             {isSiteEngineer && isAssigned && (
               <div className="space-y-2">

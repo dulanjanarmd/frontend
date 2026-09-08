@@ -76,7 +76,7 @@ const Projects = () => {
   return (
     <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
           {isSiteEngineer ? 'My Projects' : 'Projects Management'}
         </h1>
         {!isSiteEngineer && (
@@ -93,7 +93,7 @@ const Projects = () => {
       <div className="glass-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 border-b border-border">
+            <thead className="bg-slate-50  text-slate-500 border-b border-border">
               <tr>
                 <th className="px-6 py-4 font-medium">Project Name</th>
                 <th className="px-6 py-4 font-medium">Timeline</th>
@@ -103,12 +103,12 @@ const Projects = () => {
             </thead>
             <tbody className="divide-y divide-border">
               {projects.map((project) => (
-                <tr key={project.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                <tr key={project.id} className="hover:bg-slate-50/50 :bg-slate-800/50 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="font-bold text-base text-slate-900 dark:text-slate-100">{project.name}</p>
+                    <p className="font-bold text-base text-slate-900 ">{project.name}</p>
                     <p className="text-slate-500 text-xs mt-1">{project.client} • {project.location}</p>
                   </td>
-                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
+                  <td className="px-6 py-4 text-slate-600 ">
                     <div className="flex items-center text-xs">
                       <Calendar className="w-4 h-4 mr-2" />
                       {project.startDate} to {project.endDate}
@@ -123,7 +123,7 @@ const Projects = () => {
                         {project.status}
                       </span>
                       <div className="flex items-center space-x-2">
-                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 max-w-[120px]">
+                        <div className="w-full bg-slate-200  rounded-full h-2 max-w-[120px]">
                           <div className="bg-primary h-2 rounded-full" style={{ width: `${project.progress}%` }}></div>
                         </div>
                         <span className="text-xs text-slate-500 font-medium">{project.progress}%</span>
@@ -134,20 +134,20 @@ const Projects = () => {
                     <div className="flex justify-end space-x-2">
                       <button 
                         onClick={() => navigate(`/portal/projects/${project.id}`)} 
-                        className="px-3 py-1.5 text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md transition-colors flex items-center"
+                        className="px-3 py-1.5 text-sm font-medium bg-slate-100 hover:bg-slate-200  :bg-slate-700 text-slate-700  rounded-md transition-colors flex items-center"
                       >
                         View <ArrowRight className="w-4 h-4 ml-1" />
                       </button>
                       
                       {!isSiteEngineer && (
                         <>
-                          <button onClick={() => openModal('status', project)} className="p-2 text-slate-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Update Status">
+                          <button onClick={() => openModal('status', project)} className="p-2 text-slate-500 hover:text-primary hover:bg-blue-50 :bg-blue-900/30 rounded-md transition-colors" title="Update Status">
                             <Activity className="w-4 h-4" />
                           </button>
-                          <button onClick={() => openModal('milestones', project)} className="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-md transition-colors" title="Manage Milestones">
+                          <button onClick={() => openModal('milestones', project)} className="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 :bg-amber-900/30 rounded-md transition-colors" title="Manage Milestones">
                             <Flag className="w-4 h-4" />
                           </button>
-                          <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors" title="Edit Project">
+                          <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 :bg-indigo-900/30 rounded-md transition-colors" title="Edit Project">
                             <Edit2 className="w-4 h-4" />
                           </button>
                         </>
@@ -198,7 +198,7 @@ const Projects = () => {
                   <textarea rows="3" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
+                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
                   <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Save Changes</button>
                 </div>
               </form>
@@ -228,7 +228,7 @@ const Projects = () => {
                   <div className="text-center font-bold text-primary mt-2">{statusData.progress}%</div>
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
+                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
                   <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Update</button>
                 </div>
               </form>
@@ -248,7 +248,7 @@ const Projects = () => {
                   <p className="text-sm text-slate-500 text-center py-4">No milestones defined yet.</p>
                 ) : (
                   activeProject?.milestones.map(m => (
-                    <div key={m.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-slate-50/50 dark:bg-slate-900/50">
+                    <div key={m.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-slate-50/50 ">
                       <div className="flex items-center space-x-3">
                         <button onClick={() => toggleMilestone(m.id)} className="text-slate-400 hover:text-primary transition-colors">
                           {m.completed ? <CheckCircle2 className="w-5 h-5 text-green-500" /> : <Circle className="w-5 h-5" />}

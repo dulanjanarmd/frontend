@@ -53,7 +53,7 @@ const CEODashboard = () => {
       
       {/* Header */}
       <header>
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
           Welcome, {currentUser?.name || 'Executive'}
         </h1>
         <p className="text-slate-500 mt-2">Here is your strategic portfolio overview.</p>
@@ -63,23 +63,23 @@ const CEODashboard = () => {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-5 border border-border">
           <p className="text-sm font-medium text-slate-500 mb-1">Total Projects</p>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white">{totalProjects}</p>
+          <p className="text-3xl font-bold text-slate-900 ">{totalProjects}</p>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-5 border border-border">
           <p className="text-sm font-medium text-slate-500 mb-1">In Progress</p>
-          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{inProgress}</p>
+          <p className="text-3xl font-bold text-blue-600 ">{inProgress}</p>
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-5 border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-900/10">
-          <p className="text-sm font-medium text-amber-600 dark:text-amber-500 mb-1">On Hold / Delayed</p>
-          <p className="text-3xl font-bold text-amber-600 dark:text-amber-500">{onHoldDelayed}</p>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-5 border border-amber-200  bg-amber-50/50 ">
+          <p className="text-sm font-medium text-amber-600  mb-1">On Hold / Delayed</p>
+          <p className="text-3xl font-bold text-amber-600 ">{onHoldDelayed}</p>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-5 border border-border">
           <p className="text-sm font-medium text-slate-500 mb-1">Completed</p>
-          <p className="text-3xl font-bold text-green-600 dark:text-green-400">{completed}</p>
+          <p className="text-3xl font-bold text-green-600 ">{completed}</p>
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card p-5 border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-900/10">
-          <p className="text-sm font-medium text-red-600 dark:text-red-500 mb-1">Critical Issues</p>
-          <p className="text-3xl font-bold text-red-600 dark:text-red-500 flex items-center gap-2">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card p-5 border border-red-200  bg-red-50/50 ">
+          <p className="text-sm font-medium text-red-600  mb-1">Critical Issues</p>
+          <p className="text-3xl font-bold text-red-600  flex items-center gap-2">
             {criticalIssuesCount}
             {criticalIssuesCount > 0 && <ShieldAlert className="w-6 h-6 animate-pulse" />}
           </p>
@@ -91,7 +91,7 @@ const CEODashboard = () => {
         {/* Main Content (Portfolio) */}
         <div className="xl:col-span-2 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center">
+            <h2 className="text-xl font-bold text-slate-900  flex items-center">
               <Briefcase className="w-5 h-5 mr-2 text-primary" />
               Portfolio Overview
             </h2>
@@ -101,7 +101,7 @@ const CEODashboard = () => {
                 <input 
                   type="text" 
                   placeholder="Search projects..." 
-                  className="pl-9 pr-4 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none w-48 transition-all"
+                  className="pl-9 pr-4 py-2 text-sm bg-white  border border-slate-200  rounded-lg focus:ring-2 focus:ring-primary outline-none w-48 transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -109,7 +109,7 @@ const CEODashboard = () => {
               <div className="relative">
                 <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <select 
-                  className="pl-9 pr-8 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none appearance-none"
+                  className="pl-9 pr-8 py-2 text-sm bg-white  border border-slate-200  rounded-lg focus:ring-2 focus:ring-primary outline-none appearance-none"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -127,13 +127,13 @@ const CEODashboard = () => {
           <div className="glass-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-border">
+                <thead className="bg-slate-50  border-b border-border">
                   <tr>
-                    <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Project & Client</th>
-                    <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Status</th>
-                    <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Progress</th>
-                    <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">High Risks</th>
-                    <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400 text-right">Action</th>
+                    <th className="px-6 py-4 font-semibold text-slate-600 ">Project & Client</th>
+                    <th className="px-6 py-4 font-semibold text-slate-600 ">Status</th>
+                    <th className="px-6 py-4 font-semibold text-slate-600 ">Progress</th>
+                    <th className="px-6 py-4 font-semibold text-slate-600 ">High Risks</th>
+                    <th className="px-6 py-4 font-semibold text-slate-600  text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -145,28 +145,28 @@ const CEODashboard = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group"
+                        className="hover:bg-slate-50 :bg-slate-800/50 transition-colors group"
                       >
                         <td className="px-6 py-4">
-                          <p className="font-bold text-slate-900 dark:text-slate-100">{project.name}</p>
+                          <p className="font-bold text-slate-900 ">{project.name}</p>
                           <p className="text-xs text-slate-500 mt-0.5">{project.client}</p>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700`}>
+                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100  text-slate-700  border border-slate-200 `}>
                             {project.status}
                           </span>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-24 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                            <div className="w-24 bg-slate-200  rounded-full h-2">
                               <div className="bg-primary h-2 rounded-full" style={{ width: `${project.progress}%` }} />
                             </div>
-                            <span className="text-xs font-medium text-slate-600 dark:text-slate-400 w-8">{project.progress}%</span>
+                            <span className="text-xs font-medium text-slate-600  w-8">{project.progress}%</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           {highIssues > 0 ? (
-                            <span className="flex items-center text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-md w-fit">
+                            <span className="flex items-center text-xs font-bold text-red-600  bg-red-50  px-2 py-1 rounded-md w-fit">
                               <AlertTriangle className="w-3 h-3 mr-1" /> {highIssues} Open
                             </span>
                           ) : (
@@ -203,7 +203,7 @@ const CEODashboard = () => {
           {/* Critical Issues */}
           <div className="glass-card p-5 border-t-4 border-t-red-500">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center">
+              <h2 className="text-lg font-bold text-slate-900  flex items-center">
                 <ShieldAlert className="w-5 h-5 mr-2 text-red-500" />
                 Escalated Issues
               </h2>
@@ -214,17 +214,17 @@ const CEODashboard = () => {
                 {highSeverityIssues.slice(0, 4).map(issue => {
                   const proj = projects.find(p => String(p.id) === String(issue.projectId) || `p${p.id}` === issue.projectId);
                   return (
-                    <div key={issue.id} className="p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-100 dark:border-red-900/50">
+                    <div key={issue.id} className="p-3 bg-red-50  rounded-lg border border-red-100 ">
                       <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100 line-clamp-1 pr-2">{issue.title}</h4>
-                        <span className="text-[10px] uppercase font-bold text-red-600 bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded shrink-0">High</span>
+                        <h4 className="font-semibold text-sm text-slate-900  line-clamp-1 pr-2">{issue.title}</h4>
+                        <span className="text-[10px] uppercase font-bold text-red-600 bg-red-100  px-1.5 py-0.5 rounded shrink-0">High</span>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">{proj?.name}</p>
+                      <p className="text-xs text-slate-600  mb-2">{proj?.name}</p>
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-slate-500">{issue.dateReported}</span>
                         <button 
                           onClick={() => navigate(`/portal/projects/${proj?.id}`)}
-                          className="font-bold text-red-700 dark:text-red-400 hover:underline"
+                          className="font-bold text-red-700  hover:underline"
                         >
                           Investigate &rarr;
                         </button>
@@ -234,7 +234,7 @@ const CEODashboard = () => {
                 })}
               </div>
             ) : (
-              <div className="text-center py-6 text-slate-500 bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-dashed border-slate-200 dark:border-slate-700">
+              <div className="text-center py-6 text-slate-500 bg-slate-50  rounded-lg border border-dashed border-slate-200 ">
                 <CheckSquare className="w-8 h-8 mx-auto mb-2 text-green-500/50" />
                 <p className="text-sm font-medium">No critical issues</p>
                 <p className="text-xs mt-1">Portfolio health is stable.</p>
@@ -244,7 +244,7 @@ const CEODashboard = () => {
 
           {/* Recent Decisions */}
           <div className="glass-card p-5">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center">
+            <h2 className="text-lg font-bold text-slate-900  mb-4 flex items-center">
               <BarChart3 className="w-5 h-5 mr-2 text-primary" />
               Recent Client Decisions
             </h2>
@@ -254,18 +254,18 @@ const CEODashboard = () => {
                 {recentApprovals.map(approval => {
                   const proj = projects.find(p => String(p.id) === String(approval.projectId) || `p${p.id}` === approval.projectId);
                   return (
-                    <div key={approval.id} className="relative pl-4 border-l-2 border-slate-200 dark:border-slate-700">
+                    <div key={approval.id} className="relative pl-4 border-l-2 border-slate-200 ">
                       <div className={`absolute -left-[5px] top-1.5 w-2 h-2 rounded-full ${
                         approval.status === 'Approved' ? 'bg-green-500' :
                         approval.status === 'Rejected' ? 'bg-red-500' : 'bg-orange-500'
                       }`} />
-                      <p className="text-sm text-slate-800 dark:text-slate-200 font-medium line-clamp-1">{approval.title}</p>
+                      <p className="text-sm text-slate-800  font-medium line-clamp-1">{approval.title}</p>
                       <p className="text-xs text-slate-500 mt-0.5">{proj?.name}</p>
                       <div className="flex items-center gap-2 mt-1.5">
                         <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                          approval.status === 'Approved' ? 'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30' :
-                          approval.status === 'Rejected' ? 'text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/30' : 
-                          'text-orange-700 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30'
+                          approval.status === 'Approved' ? 'text-green-700 bg-green-100  ' :
+                          approval.status === 'Rejected' ? 'text-red-700 bg-red-100  ' : 
+                          'text-orange-700 bg-orange-100  '
                         }`}>
                           {approval.status}
                         </span>

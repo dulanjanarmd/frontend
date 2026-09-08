@@ -110,11 +110,11 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
       {/* Alert banner */}
       {(pendingCount > 0 || changesCount > 0) && isPM && (
         <div className={`rounded-lg p-4 border flex items-center gap-3 ${
-          changesCount > 0 ? 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800' :
-          'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800'
+          changesCount > 0 ? 'bg-orange-50 border-orange-200  ' :
+          'bg-amber-50 border-amber-200  '
         }`}>
           <Clock className={`w-5 h-5 shrink-0 ${changesCount > 0 ? 'text-orange-500' : 'text-amber-500'}`} />
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <p className="text-sm font-medium text-slate-700 ">
             {changesCount > 0
               ? `${changesCount} approval${changesCount > 1 ? 's' : ''} need your attention — client requested changes.`
               : `${pendingCount} approval${pendingCount > 1 ? 's' : ''} awaiting client response.`
@@ -163,7 +163,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                         </span>
                       )}
                     </div>
-                    <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1">{approval.title}</h3>
+                    <h3 className="font-bold text-slate-900  mb-1">{approval.title}</h3>
                     {approval.description && (
                       <p className="text-sm text-slate-500 line-clamp-1">{approval.description}</p>
                     )}
@@ -203,7 +203,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                 <X className="w-5 h-5" />
               </button>
               <h2 className="text-xl font-bold mb-1">Request Client Approval</h2>
-              <p className="text-sm text-slate-500 mb-5">For: <span className="font-semibold text-slate-700 dark:text-slate-300">{project?.name}</span></p>
+              <p className="text-sm text-slate-500 mb-5">For: <span className="font-semibold text-slate-700 ">{project?.name}</span></p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -240,16 +240,16 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                 {projectLogs.length > 0 && (
                   <div>
                     <label className="block text-sm font-medium mb-2">Link Progress Logs (optional)</label>
-                    <div className="space-y-2 max-h-36 overflow-y-auto border border-border rounded-md p-2 bg-slate-50 dark:bg-slate-900/50">
+                    <div className="space-y-2 max-h-36 overflow-y-auto border border-border rounded-md p-2 bg-slate-50 ">
                       {projectLogs.map(log => (
-                        <label key={log.id} className="flex items-center gap-2 cursor-pointer py-1 px-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+                        <label key={log.id} className="flex items-center gap-2 cursor-pointer py-1 px-2 hover:bg-slate-100 :bg-slate-800 rounded">
                           <input
                             type="checkbox"
                             checked={formData.linkedLogIds.includes(log.id)}
                             onChange={() => toggleLog(log.id)}
                             className="accent-primary"
                           />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">{log.date}</span>
+                          <span className="text-sm text-slate-700 ">{log.date}</span>
                           <span className="text-xs text-slate-500 truncate">{log.workDone}</span>
                           <span className="ml-auto text-xs text-primary font-semibold shrink-0">+{log.percentageCompleted}%</span>
                         </label>
@@ -262,7 +262,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                 )}
 
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
                   <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 flex items-center gap-2">
                     <Send className="w-4 h-4" /> Send to Client
                   </button>

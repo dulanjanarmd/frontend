@@ -77,12 +77,12 @@ const CreateProjectForm = () => {
       <div className="flex items-center mb-6">
         <button 
           onClick={() => navigate('/portal')}
-          className="mr-4 p-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors"
+          className="mr-4 p-2 text-slate-500 hover:bg-slate-200 :bg-slate-800 rounded-full transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
             Create New Project
           </h1>
           <p className="text-slate-500 mt-1">Set up a new project after proposal acceptance.</p>
@@ -90,7 +90,7 @@ const CreateProjectForm = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg border border-red-200 dark:border-red-800 mb-6">
+        <div className="bg-red-50  text-red-600  p-4 rounded-lg border border-red-200  mb-6">
           {error}
         </div>
       )}
@@ -162,7 +162,7 @@ const CreateProjectForm = () => {
             <MilestoneFormList milestones={milestones} setMilestones={setMilestones} />
           </div>
           
-          <div className="glass-card p-6 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50">
+          <div className="glass-card p-6 flex flex-col items-center justify-center bg-slate-50 ">
              <button 
               type="submit" 
               form="createProjectForm"

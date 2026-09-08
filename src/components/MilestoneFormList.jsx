@@ -24,14 +24,14 @@ const MilestoneFormList = ({ milestones, setMilestones }) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Project Milestones</h3>
+      <h3 className="text-lg font-semibold text-slate-800 ">Project Milestones</h3>
       
       {milestones.length > 0 && (
         <div className="space-y-2 mb-4">
           {milestones.map((milestone, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-border">
+            <div key={index} className="flex items-center justify-between p-3 bg-slate-50  rounded-lg border border-border">
               <div>
-                <p className="font-medium text-sm text-slate-900 dark:text-slate-100">{milestone.name}</p>
+                <p className="font-medium text-sm text-slate-900 ">{milestone.name}</p>
                 <div className="flex items-center text-xs text-slate-500 mt-1">
                   <Calendar className="w-3 h-3 mr-1" />
                   {milestone.dueDate}
@@ -40,7 +40,7 @@ const MilestoneFormList = ({ milestones, setMilestones }) => {
               <button 
                 type="button"
                 onClick={() => handleRemove(index)}
-                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 :bg-red-900/20 rounded-md transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -49,7 +49,7 @@ const MilestoneFormList = ({ milestones, setMilestones }) => {
         </div>
       )}
 
-      <div className="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg border border-border">
+      <div className="bg-slate-100  p-4 rounded-lg border border-border">
         <h4 className="text-sm font-medium mb-3">Add New Milestone</h4>
         <div className="flex flex-col sm:flex-row gap-3">
           <input 
@@ -68,7 +68,7 @@ const MilestoneFormList = ({ milestones, setMilestones }) => {
           <button 
             type="button"
             onClick={handleAdd}
-            className="flex items-center justify-center px-4 py-2 bg-slate-800 dark:bg-slate-700 text-white rounded-md hover:bg-slate-700 dark:hover:bg-slate-600 transition-colors text-sm font-medium"
+            className="flex items-center justify-center px-4 py-2 bg-slate-800  text-white rounded-md hover:bg-slate-700 :bg-slate-600 transition-colors text-sm font-medium"
           >
             <Plus className="w-4 h-4 mr-1" />
             Add

@@ -75,13 +75,13 @@ const ProjectDetailPage = () => {
           <div className="flex items-start">
             <button
               onClick={() => navigate('/portal')}
-              className="mr-3 p-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors shrink-0 mt-0.5"
+              className="mr-3 p-2 text-slate-500 hover:bg-slate-200 :bg-slate-800 rounded-full transition-colors shrink-0 mt-0.5"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 ">
                   {project.name}
                 </h1>
                 <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${STATUS_STYLE[project.status] || 'bg-slate-100 text-slate-600'}`}>
@@ -99,7 +99,7 @@ const ProjectDetailPage = () => {
                 <span className="text-slate-500">Progress</span>
                 <span className="font-bold text-primary">{project.progress}%</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+              <div className="w-full bg-slate-200  rounded-full h-2.5">
                 <div
                   className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2.5 rounded-full transition-all duration-700"
                   style={{ width: `${project.progress}%` }}
@@ -121,7 +121,7 @@ const ProjectDetailPage = () => {
                 className={`flex items-center py-3 px-3 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                   isActive
                     ? 'border-primary text-primary'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:hover:text-slate-300 dark:hover:border-slate-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 :text-slate-300 :border-slate-600'
                 }`}
               >
                 <Icon className={`w-4 h-4 mr-1.5 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
