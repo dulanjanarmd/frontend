@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { users } from '../utils/mockData';
 
 const AuthContext = createContext();
 
@@ -16,35 +15,47 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching session from local storage
-    const storedUserId = localStorage.getItem('mockUserId');
-    if (storedUserId) {
-      const user = users.find(u => u.id === storedUserId);
-      if (user) setCurrentUser(user);
+    // Check if user is logged in
+    const storedUser = localStorage.getItem('prismoUser');
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
-    // Simulated async login
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Find user by email (ignoring password for this mock)
-        const user = users.find(u => u.email === email);
-        if (user) {
-          setCurrentUser(user);
-          localStorage.setItem('mockUserId', user.id);
-          resolve(user);
-        } else {
-          reject(new Error('Invalid email or password'));
-        }
-      }, 500);
-    });
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Invalid email or password');
+      }
+
+      const data = await response.json();
+      
+      const user = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role.toLowerCase(),
+        token: data.token
+      };
+
+      setCurrentUser(user);
+      localStorage.setItem('prismoUser', JSON.stringify(user));
+      return user;
+    } catch (err) {
+      throw new Error(err.message);
+    }
   };
 
   const logout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('mockUserId');
+    localStorage.removeItem('prismoUser');
   };
 
   const value = {
