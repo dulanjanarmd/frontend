@@ -61,30 +61,30 @@ const LandingPage = () => {
         </header>
 
         {/* Hero Content matching the screenshot layout */}
-        <div className="max-w-4xl mx-auto text-center pt-16 pb-12">
+        <div className="max-w-4xl mx-auto text-center pt-8 pb-4">
 
           {/* Hero Title */}
-          <h1 className="text-5xl md:text-6xl font-medium text-[#1e293b] mb-8 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-medium text-[#1e293b] mb-4 leading-tight">
             Construction Site Management: A Practical Guide
           </h1>
           
-          <p className="text-[#4b5563] font-medium mb-12">
+          <p className="text-[#4b5563] font-medium mb-6">
             Prismo Constructions Platform
           </p>
 
         </div>
 
         {/* Hero Image overlapping the bottom curve */}
-        <div className="max-w-5xl mx-auto relative px-4 z-10">
-          <div className="relative h-[300px] md:h-[450px] w-full rounded-t-3xl overflow-hidden shadow-2xl">
+        <div className="max-w-7xl mx-auto relative px-4 z-10">
+          <div className="relative h-[300px] md:h-[400px] lg:h-[500px] w-full rounded-t-3xl overflow-hidden shadow-2xl">
             <ImageCarousel className="absolute inset-0 w-full h-full" />
             
             {/* Text Overlay (placed above carousel) */}
-            <div className="absolute bottom-8 left-8 z-20 pointer-events-none">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">
+            <div className="absolute bottom-12 left-12 z-20 pointer-events-none">
+              <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
                 Construction Site<br/>Management
               </h2>
-              <p className="text-xl text-white/90">Insights</p>
+              <p className="text-2xl text-white/90 drop-shadow-md">Insights</p>
             </div>
           </div>
         </div>
