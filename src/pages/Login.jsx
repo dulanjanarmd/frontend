@@ -44,8 +44,8 @@ const Login = () => {
           </div>
           
           <div className="flex items-center bg-[#d1d5db] h-12 rounded-lg p-1 space-x-1 text-sm font-bold">
-            <Link to="/login" className="px-6 py-2 text-[#4b5563] hover:text-[#1e293b] transition-colors uppercase">
-              Sign In
+            <Link to="/register" className="px-6 py-2 text-[#4b5563] hover:text-[#1e293b] transition-colors uppercase">
+              Sign Up
             </Link>
             <Link to="/register" className="px-6 py-2 bg-primary text-[#022c22] rounded-md transition-colors uppercase h-full flex items-center hover:opacity-90">
               Book a Demo
