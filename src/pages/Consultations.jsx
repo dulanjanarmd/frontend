@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, CheckCircle2, ArrowRight, User, Phone, Mail, Building2, UploadCloud, X } from 'lucide-react';
+import { FileText, CheckCircle2, ArrowRight, User, Phone, Mail, Building2, UploadCloud, X, Send, ShieldAlert, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Consultations = () => {
   const { consultations, updateConsultation, addProject } = useData();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [proposalUrl, setProposalUrl] = useState('');
 
+  const isPM = currentUser?.role === 'pm';
+  const isCEO = currentUser?.role === 'ceo';
+
   const handleUpdateStatus = (id, newStatus) => {
     updateConsultation(id, { status: newStatus });
+    if (selectedConsultation && selectedConsultation.id === id) {
+      setSelectedConsultation(null);
+    }
   };
 
   const handleAttachProposal = (e) => {
@@ -47,6 +55,8 @@ const Consultations = () => {
     navigate('/portal/projects');
   };
 
+  const columns = ['New Inquiry', 'Proposal Sent', 'Accepted', 'Pending CEO Approval', 'CEO Approved', 'Converted'];
+
   return (
     <div className="space-y-6 relative h-full">
       <div className="flex justify-between items-center">
@@ -58,12 +68,12 @@ const Consultations = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
+      <div className="flex overflow-x-auto gap-6 pb-6 items-start w-full">
         {/* Kanban Board Columns */}
-        {['New Inquiry', 'Proposal Sent', 'Accepted', 'Converted'].map(status => {
+        {columns.map(status => {
           const colConsultations = consultations.filter(c => c.status === status);
           return (
-            <div key={status} className="bg-slate-100 dark:bg-slate-900/50 rounded-xl p-4 min-h-[60vh] border border-border">
+            <div key={status} className="bg-slate-100 dark:bg-slate-900/50 rounded-xl p-4 min-h-[60vh] border border-border min-w-[300px] w-[320px] flex-shrink-0">
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
                 <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300">{status}</h3>
                 <span className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs px-2 py-1 rounded-full font-bold">
@@ -177,7 +187,7 @@ const Consultations = () => {
                 </form>
               )}
 
-              {selectedConsultation.status === 'Proposal Sent' && (
+              {selectedConsultation.status === 'Proposal Sent' && isPM && (
                 <div className="mb-6 border-t border-border pt-6 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-4 rounded">
                   <p className="text-sm font-medium">Has the client accepted the proposal?</p>
                   <button 
@@ -189,10 +199,63 @@ const Consultations = () => {
                 </div>
               )}
 
-              {selectedConsultation.status === 'Accepted' && (
+              {selectedConsultation.status === 'Accepted' && isPM && (
                 <div className="mb-6 border border-primary/50 bg-primary/5 p-6 rounded text-center">
                   <h3 className="text-xl font-bold mb-2">Client Accepted!</h3>
-                  <p className="text-slate-500 text-sm mb-4">You can now convert this consultation into an active project in the system.</p>
+                  <p className="text-slate-500 text-sm mb-6">Review the project details. You can request CEO approval before creating the project, or create it directly if approval is not needed.</p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    <button 
+                      onClick={() => handleUpdateStatus(selectedConsultation.id, 'Pending CEO Approval')}
+                      className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md transition-colors font-medium shadow-md text-sm"
+                    >
+                      <ShieldAlert className="w-4 h-4 mr-2" /> Request CEO Approval
+                    </button>
+                    <button 
+                      onClick={() => handleConvertToProject(selectedConsultation)}
+                      className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-md transition-colors font-medium shadow-md shadow-blue-500/30 text-sm"
+                    >
+                      Create Project Directly <ArrowRight className="w-4 h-4 ml-2" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedConsultation.status === 'Pending CEO Approval' && isCEO && (
+                <div className="mb-6 border border-amber-500/50 bg-amber-50 dark:bg-amber-900/10 p-6 rounded text-center">
+                  <h3 className="text-xl font-bold text-amber-700 dark:text-amber-500 mb-2">CEO Approval Required</h3>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">The project manager has requested approval to create this project.</p>
+                  <div className="flex space-x-3 justify-center">
+                    <button 
+                      onClick={() => handleUpdateStatus(selectedConsultation.id, 'CEO Approved')}
+                      className="flex items-center justify-center px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors font-medium shadow-md text-sm"
+                    >
+                      <Check className="w-4 h-4 mr-2" /> Approve Project
+                    </button>
+                    <button 
+                      onClick={() => handleUpdateStatus(selectedConsultation.id, 'Accepted')}
+                      className="flex items-center justify-center px-6 py-2 bg-white dark:bg-slate-800 border border-border text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors font-medium text-sm"
+                    >
+                      <X className="w-4 h-4 mr-2" /> Reject
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {selectedConsultation.status === 'Pending CEO Approval' && !isCEO && (
+                <div className="mb-6 border border-amber-500/50 bg-amber-50 dark:bg-amber-900/10 p-4 rounded text-center">
+                  <ShieldAlert className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                  <h3 className="font-bold text-amber-700 dark:text-amber-500">Waiting for CEO</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">This project is pending review and approval from the CEO.</p>
+                </div>
+              )}
+
+              {selectedConsultation.status === 'CEO Approved' && isPM && (
+                <div className="mb-6 border border-green-500/50 bg-green-50 dark:bg-green-900/10 p-6 rounded text-center">
+                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-green-700 dark:text-green-500 mb-2">CEO Approved!</h3>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">You have permission to convert this consultation into an active project.</p>
                   <button 
                     onClick={() => handleConvertToProject(selectedConsultation)}
                     className="btn-primary flex items-center justify-center mx-auto"
@@ -211,3 +274,4 @@ const Consultations = () => {
 };
 
 export default Consultations;
+
