@@ -53,6 +53,55 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (name, email, password, role) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role })
+      });
+      
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(errorMsg || 'Registration failed');
+      }
+
+      const data = await response.json();
+      
+      const user = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role.toLowerCase(),
+        token: data.token
+      };
+
+      setCurrentUser(user);
+      localStorage.setItem('prismoUser', JSON.stringify(user));
+      return user;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  };
+
+  const resetPassword = async (email, newPassword) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, newPassword })
+      });
+      
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(errorMsg || 'Password reset failed');
+      }
+      return true;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  };
+
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('prismoUser');
@@ -61,6 +110,8 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     login,
+    register,
+    resetPassword,
     logout,
     loading
   };
