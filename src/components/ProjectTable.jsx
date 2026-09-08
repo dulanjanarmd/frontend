@@ -64,7 +64,7 @@ const ProjectTable = ({ projects }) => {
               <tr 
                 key={project.id} 
                 className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
-                onClick={() => navigate(`/portal/projects`)}
+                onClick={() => navigate(`/portal/projects/${project.id}`)}
               >
                 <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-100">{project.name}</td>
                 <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{project.client}</td>
@@ -89,6 +89,10 @@ const ProjectTable = ({ projects }) => {
                 <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">{project.endDate}</td>
                 <td className="px-6 py-4 text-right">
                   <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/portal/projects/${project.id}`);
+                    }}
                     className="text-primary hover:text-blue-600 font-medium text-sm transition-colors"
                   >
                     View

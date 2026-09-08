@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import AdminPortal from './pages/AdminPortal';
 import Consultations from './pages/Consultations';
 import CreateProjectPage from './pages/CreateProjectPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 
 const RequireAuth = ({ children, allowedRoles }) => {
   const { currentUser } = useAuth();
@@ -61,6 +62,7 @@ function App() {
             <CreateProjectPage />
           </RequireAuth>
         } />
+        <Route path="projects/:id" element={<ProjectDetailPage />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="logs" element={<Logs />} />
         <Route path="approvals" element={<Approvals />} />
