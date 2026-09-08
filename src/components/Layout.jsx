@@ -46,7 +46,8 @@ const Navbar = () => {
       { name: 'Recent Activity', path: '/portal/activity', icon: <Activity className="w-4 h-4 mr-2" /> },
     ],
     client: [
-      { name: 'My Project', path: '/portal', icon: <Briefcase className="w-4 h-4 mr-2" /> },
+      { name: 'Dashboard', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
+      { name: 'My Projects', path: '/portal/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
       { name: 'Approvals', path: '/portal/approvals', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
     ]
   };

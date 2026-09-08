@@ -29,11 +29,14 @@ const ProjectDetailPage = () => {
   const { currentUser } = useAuth();
 
   const isSiteEngineer = currentUser?.role === 'site_engineer';
+  const isClient = currentUser?.role === 'client';
 
   // Filter tabs based on role
   const availableTabs = isSiteEngineer 
     ? TABS.filter(t => ['overview', 'tasks', 'progress', 'issues'].includes(t.id))
-    : TABS;
+    : isClient
+      ? TABS.filter(t => ['overview', 'milestones', 'progress', 'documents', 'approvals'].includes(t.id))
+      : TABS;
 
   const [activeTab, setActiveTab] = useState('overview');
   const [project, setProject] = useState(null);
