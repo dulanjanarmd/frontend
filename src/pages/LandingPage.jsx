@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
+import ImageCarousel from '../components/ImageCarousel';
 
 const LandingPage = () => {
   const { addConsultation } = useData();
@@ -74,11 +75,12 @@ const LandingPage = () => {
         </div>
 
         {/* Hero Image overlapping the bottom curve */}
-        <div className="max-w-5xl mx-auto relative px-4">
+        <div className="max-w-5xl mx-auto relative px-4 z-10">
           <div className="relative h-[300px] md:h-[450px] w-full rounded-t-3xl overflow-hidden shadow-2xl">
-            <img src="/hero-image.jpg" alt="3D Construction Site" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/40"></div>
-            <div className="absolute bottom-8 left-8">
+            <ImageCarousel className="absolute inset-0 w-full h-full" />
+            
+            {/* Text Overlay (placed above carousel) */}
+            <div className="absolute bottom-8 left-8 z-20 pointer-events-none">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">
                 Construction Site<br/>Management
               </h2>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import ImageCarousel from '../components/ImageCarousel';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -60,9 +61,16 @@ const Login = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-xl h-[600px] flex flex-col bg-white p-12 rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden"
+          className="w-full max-w-5xl h-[600px] flex bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden"
         >
-          <div className="text-center">
+          {/* Left Side: Carousel */}
+          <div className="hidden md:block w-1/2 h-full relative border-r border-slate-100">
+            <ImageCarousel className="absolute inset-0 w-full h-full" />
+          </div>
+          
+          {/* Right Side: Form */}
+          <div className="w-full md:w-1/2 p-12 flex flex-col justify-between">
+            <div className="text-center">
             <h1 className="text-4xl font-bold text-slate-900 mb-3 tracking-tight">Prismo Constructions</h1>
             <p className="text-slate-500 text-lg">Welcome back. Please sign in.</p>
           </div>
@@ -114,8 +122,9 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="text-center text-sm text-slate-500">
-            Don't have an account? <Link to="/register" className="text-primary font-bold hover:underline">Sign Up</Link>
+            <div className="text-center text-sm text-slate-500">
+              Don't have an account? <Link to="/register" className="text-primary font-bold hover:underline">Sign Up</Link>
+            </div>
           </div>
         </motion.div>
       </main>
