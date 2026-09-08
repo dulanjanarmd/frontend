@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import PMDashboard from '../components/PMDashboard';
 import SiteEngineerDashboard from '../components/SiteEngineerDashboard';
 import ClientDashboard from '../components/ClientDashboard';
+import CEODashboard from '../components/CEODashboard';
 import AdminPortal from './AdminPortal';
 import { Navigate } from 'react-router-dom';
 
@@ -21,7 +22,11 @@ const Dashboard = () => {
     return <ClientDashboard />;
   }
 
-  // Default to PM Dashboard for project_manager, ceo, etc.
+  if (currentUser?.role === 'ceo') {
+    return <CEODashboard />;
+  }
+
+  // Default to PM Dashboard for project_manager, etc.
   return <PMDashboard />;
 };
 

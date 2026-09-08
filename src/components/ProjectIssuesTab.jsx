@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, Plus, X, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -23,6 +24,10 @@ const STATUS_NEXT = {
 
 const ProjectIssuesTab = ({ project }) => {
   const { logs } = useData();
+  const { currentUser } = useAuth();
+  
+  const isCEO = currentUser?.role === 'ceo';
+
   const [issues, setIssues] = useState(() => {
     // Seed from logs that reported issues for this project
     const projectId = project.id;
@@ -87,13 +92,15 @@ const ProjectIssuesTab = ({ project }) => {
             {openCount} open · {resolvedCount} resolved
           </p>
         </div>
-        <button
-          onClick={() => setIsAdding(true)}
-          className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30 font-bold"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Report Issue
-        </button>
+        {!isCEO && (
+          <button
+            onClick={() => setIsAdding(true)}
+            className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30 font-bold"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Report Issue
+          </button>
+        )}
       </div>
 
       {/* Summary chips */}
@@ -203,29 +210,31 @@ const ProjectIssuesTab = ({ project }) => {
                     <h3 className="font-bold text-slate-900 dark:text-slate-100">{issue.title}</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{issue.description}</p>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    {issue.status !== 'Resolved' && (
+                  {!isCEO && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      {issue.status !== 'Resolved' && (
+                        <button
+                          onClick={() => advanceStatus(issue.id)}
+                          title={`Move to ${STATUS_NEXT[issue.status]}`}
+                          className="px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded-md transition-colors whitespace-nowrap"
+                        >
+                          → {STATUS_NEXT[issue.status]}
+                        </button>
+                      )}
                       <button
-                        onClick={() => advanceStatus(issue.id)}
-                        title={`Move to ${STATUS_NEXT[issue.status]}`}
-                        className="px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded-md transition-colors whitespace-nowrap"
+                        onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
+                        className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"
                       >
-                        → {STATUS_NEXT[issue.status]}
+                        {expandedId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
-                    )}
-                    <button
-                      onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
-                      className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"
-                    >
-                      {expandedId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(issue.id)}
-                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
+                      <button
+                        onClick={() => handleDelete(issue.id)}
+                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Resolution note */}
