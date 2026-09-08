@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { users } from '../utils/mockData';
 import { Plus, X, ListTodo, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Tasks = () => {
-  const { tasks, addTask, updateTask, projects } = useData();
+  const { tasks, addTask, updateTask, projects, users } = useData();
   const { currentUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({

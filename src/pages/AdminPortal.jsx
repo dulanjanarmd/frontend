@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import { users as initialUsers } from '../utils/mockData';
+import React, { useState, useEffect } from 'react';
+import { useData } from '../context/DataContext';
 import { UserPlus, Shield, Mail, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const AdminPortal = () => {
-  const [usersList, setUsersList] = useState(initialUsers);
+  const { users } = useData();
+  const [usersList, setUsersList] = useState([]);
+
+  useEffect(() => {
+    setUsersList(users);
+  }, [users]);
 
   return (
     <div className="space-y-6">
