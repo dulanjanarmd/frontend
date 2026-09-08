@@ -88,7 +88,36 @@ export const DataProvider = ({ children }) => {
     loadData();
   }, [currentUser]);
 
-  const addProject = (project) => setProjects([...projects, { ...project, id: `p${Date.now()}` }]);
+  const addProject = async (projectData) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/projects', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(projectData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create project');
+      }
+      
+      const newProject = await response.json();
+      
+      // Update local state with the new project from backend
+      setProjects([...projects, { 
+        ...newProject, 
+        progress: newProject.progressPercentage,
+        client: newProject.client?.name || 'Unknown' 
+      }]);
+      
+      return newProject;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
   const updateProject = (id, updates) => setProjects(projects.map(p => p.id === id ? { ...p, ...updates } : p));
   
   const addTask = (task) => setTasks([...tasks, { ...task, id: `t${Date.now()}` }]);

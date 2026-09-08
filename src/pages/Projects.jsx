@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const Projects = () => {
-  const { projects, addProject, updateProject } = useData();
+  const { projects, updateProject } = useData();
+  const navigate = useNavigate();
   
   // Modals state
   const [modalType, setModalType] = useState(null); // 'create', 'edit', 'milestones', 'status'
@@ -22,8 +24,6 @@ const Projects = () => {
     setActiveProject(project);
     if (type === 'edit' && project) {
       setFormData(project);
-    } else if (type === 'create') {
-      setFormData({ name: '', client: '', location: '', startDate: '', endDate: '', description: '' });
     } else if (type === 'status' && project) {
       setStatusData({ status: project.status, progress: project.progress });
     }
@@ -36,9 +36,7 @@ const Projects = () => {
 
   const handleCreateEdit = (e) => {
     e.preventDefault();
-    if (modalType === 'create') {
-      addProject({ ...formData, status: 'Planning', progress: 0, milestones: [] });
-    } else if (modalType === 'edit') {
+    if (modalType === 'edit') {
       updateProject(activeProject.id, formData);
     }
     closeModal();
@@ -78,7 +76,7 @@ const Projects = () => {
           Projects Management
         </h1>
         <button 
-          onClick={() => openModal('create')}
+          onClick={() => navigate('/portal/projects/new')}
           className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
         >
           <Plus className="w-5 h-5 mr-2" />
@@ -147,12 +145,12 @@ const Projects = () => {
       </div>
 
       <AnimatePresence>
-        {/* Create / Edit Project Modal */}
-        {(modalType === 'create' || modalType === 'edit') && (
+        {/* Edit Project Modal */}
+        {modalType === 'edit' && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6 relative">
               <button onClick={closeModal} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
-              <h2 className="text-xl font-bold mb-6">{modalType === 'create' ? 'Create New Project' : 'Edit Project Details'}</h2>
+              <h2 className="text-xl font-bold mb-6">Edit Project Details</h2>
               <form onSubmit={handleCreateEdit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Project Name</label>
@@ -184,7 +182,7 @@ const Projects = () => {
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
                   <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">{modalType === 'create' ? 'Create Project' : 'Save Changes'}</button>
+                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Save Changes</button>
                 </div>
               </form>
             </motion.div>

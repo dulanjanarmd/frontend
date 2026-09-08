@@ -12,6 +12,7 @@ import Tasks from './pages/Tasks';
 import Login from './pages/Login';
 import AdminPortal from './pages/AdminPortal';
 import Consultations from './pages/Consultations';
+import CreateProjectPage from './pages/CreateProjectPage';
 
 const RequireAuth = ({ children, allowedRoles }) => {
   const { currentUser } = useAuth();
@@ -55,6 +56,11 @@ function App() {
           currentUser?.role === 'admin' ? <Navigate to="/portal/admin" replace /> : <Dashboard />
         } />
         <Route path="projects" element={<Projects />} />
+        <Route path="projects/new" element={
+          <RequireAuth allowedRoles={['project_manager', 'admin']}>
+            <CreateProjectPage />
+          </RequireAuth>
+        } />
         <Route path="tasks" element={<Tasks />} />
         <Route path="logs" element={<Logs />} />
         <Route path="approvals" element={<Approvals />} />
