@@ -3,24 +3,25 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 
-const Login = () => {
+const ResetPassword = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [status, setStatus] = useState({ type: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { resetPassword } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setStatus({ type: '', message: '' });
     
     try {
-      await login(email, password);
-      navigate('/portal');
+      await resetPassword(email, newPassword);
+      setStatus({ type: 'success', message: 'Password reset successfully. You can now login.' });
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
-      setError(err.message);
+      setStatus({ type: 'error', message: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -28,7 +29,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 relative font-sans overflow-hidden">
-      
       {/* Exact Header matching Landing Page */}
       <div className="w-full px-4 sm:px-8">
         <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
@@ -56,30 +56,33 @@ const Login = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10">
-        
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-slate-200"
         >
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Prismo Constructions</h1>
-            <p className="text-slate-500">Welcome back. Please sign in.</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Reset Password</h1>
+            <p className="text-slate-500">Enter your email and a new password.</p>
           </div>
 
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded text-sm mb-6 text-center border border-red-200 font-medium">
-              {error}
+          {status.message && (
+            <div className={`p-3 rounded text-sm mb-6 text-center border font-medium ${
+              status.type === 'success' 
+                ? 'bg-green-50 text-green-700 border-green-200' 
+                : 'bg-red-50 text-red-600 border-red-200'
+            }`}>
+              {status.message}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleReset} className="space-y-4">
             <div>
               <input 
                 required 
                 type="email" 
                 className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                placeholder="Email address..."
+                placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -89,38 +92,31 @@ const Login = () => {
                 required 
                 type="password" 
                 className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                placeholder="Password..."
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
               />
             </div>
 
-            <div className="flex justify-end">
-              <Link to="/reset-password" className="text-sm text-primary font-semibold hover:underline">
-                Forgot Password?
-              </Link>
-            </div>
-
             <button 
-              disabled={isLoading}
+              disabled={isLoading || status.type === 'success'}
               type="submit" 
-              className="w-full flex items-center justify-center px-4 py-3 bg-primary text-primary-foreground rounded font-bold hover:opacity-90 transition-opacity disabled:opacity-70 mt-2 shadow-sm shadow-primary/20"
+              className="w-full flex items-center justify-center px-4 py-3 bg-primary text-primary-foreground rounded font-bold hover:opacity-90 transition-opacity disabled:opacity-70 mt-4 shadow-sm shadow-primary/20"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
               ) : (
-                "SIGN IN"
+                "RESET PASSWORD"
               )}
             </button>
           </form>
 
           <div className="mt-8 text-center text-sm text-slate-500">
-            Don't have an account? <Link to="/register" className="text-primary font-bold hover:underline">Sign Up</Link>
+            Remember your password? <Link to="/login" className="text-primary font-bold hover:underline">Sign In</Link>
           </div>
         </motion.div>
       </main>
 
-      {/* Decorative background element */}
       <div className="absolute -bottom-32 -right-32 text-slate-200 opacity-50 pointer-events-none z-0">
         <div className="w-96 h-96 border-[40px] border-current rounded-full"></div>
       </div>
@@ -128,4 +124,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

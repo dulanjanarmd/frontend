@@ -10,6 +10,8 @@ import Logs from './pages/Logs';
 import Approvals from './pages/Approvals';
 import Tasks from './pages/Tasks';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import AdminPortal from './pages/AdminPortal';
 import Consultations from './pages/Consultations';
 import Issues from './pages/Issues';
@@ -48,6 +50,8 @@ function App() {
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={currentUser ? <Navigate to="/portal" replace /> : <Login />} />
+      <Route path="/register" element={currentUser ? <Navigate to="/portal" replace /> : <Register />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       
       {/* Protected Portal Routes */}
       <Route path="/portal" element={

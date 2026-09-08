@@ -3,21 +3,25 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Register = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'CLIENT'
+  });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     
     try {
-      await login(email, password);
+      await register(formData.name, formData.email, formData.password, formData.role);
       navigate('/portal');
     } catch (err) {
       setError(err.message);
@@ -28,7 +32,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 relative font-sans overflow-hidden">
-      
       {/* Exact Header matching Landing Page */}
       <div className="w-full px-4 sm:px-8">
         <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
@@ -55,16 +58,15 @@ const Login = () => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10">
-        
+      <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10 py-12">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-slate-200"
         >
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Prismo Constructions</h1>
-            <p className="text-slate-500">Welcome back. Please sign in.</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Account</h1>
+            <p className="text-slate-500">Join Prismo Constructions Platform</p>
           </div>
 
           {error && (
@@ -73,15 +75,25 @@ const Login = () => {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div>
+              <input 
+                required 
+                type="text" 
+                className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
+            </div>
             <div>
               <input 
                 required 
                 type="email" 
                 className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                placeholder="Email address..."
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email address"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
               />
             </div>
             <div>
@@ -89,38 +101,42 @@ const Login = () => {
                 required 
                 type="password" 
                 className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                placeholder="Password..."
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
             </div>
-
-            <div className="flex justify-end">
-              <Link to="/reset-password" className="text-sm text-primary font-semibold hover:underline">
-                Forgot Password?
-              </Link>
+            <div>
+              <select 
+                className="w-full rounded bg-slate-50 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                value={formData.role}
+                onChange={(e) => setFormData({...formData, role: e.target.value})}
+              >
+                <option value="CLIENT">Client</option>
+                <option value="SITE_ENGINEER">Site Engineer</option>
+                <option value="PROJECT_MANAGER">Project Manager</option>
+              </select>
             </div>
 
             <button 
               disabled={isLoading}
               type="submit" 
-              className="w-full flex items-center justify-center px-4 py-3 bg-primary text-primary-foreground rounded font-bold hover:opacity-90 transition-opacity disabled:opacity-70 mt-2 shadow-sm shadow-primary/20"
+              className="w-full flex items-center justify-center px-4 py-3 bg-primary text-primary-foreground rounded font-bold hover:opacity-90 transition-opacity disabled:opacity-70 mt-4 shadow-sm shadow-primary/20"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
               ) : (
-                "SIGN IN"
+                "SIGN UP"
               )}
             </button>
           </form>
 
           <div className="mt-8 text-center text-sm text-slate-500">
-            Don't have an account? <Link to="/register" className="text-primary font-bold hover:underline">Sign Up</Link>
+            Already have an account? <Link to="/login" className="text-primary font-bold hover:underline">Sign In</Link>
           </div>
         </motion.div>
       </main>
 
-      {/* Decorative background element */}
       <div className="absolute -bottom-32 -right-32 text-slate-200 opacity-50 pointer-events-none z-0">
         <div className="w-96 h-96 border-[40px] border-current rounded-full"></div>
       </div>
@@ -128,4 +144,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
