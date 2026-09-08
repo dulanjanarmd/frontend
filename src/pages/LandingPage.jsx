@@ -3,18 +3,20 @@ import { Link } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
 import ImageCarousel from '../components/ImageCarousel';
+import { useState } from 'react';
 
 const LandingPage = () => {
   const { addConsultation } = useData();
-  
   const [formData, setFormData] = useState({
-    clientName: '',
+    name: '',
     email: '',
     phone: '',
-    service: 'Construction Management',
-    description: ''
+    projectType: 'Commercial Build',
+    location: '',
+    notes: ''
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -101,49 +103,103 @@ const LandingPage = () => {
             <p className="text-[#64748b]">Tell us about your project, and our experts will get back to you with a proposal.</p>
           </div>
 
-          {submitted ? (
+          {submitSuccess ? (
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12">
               <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
               <h3 className="text-2xl font-bold text-[#1e293b] mb-2">Request Received!</h3>
               <p className="text-[#64748b]">Our team will review your requirements and contact you shortly.</p>
+              <button onClick={() => setSubmitSuccess(false)} className="mt-4 text-primary font-bold hover:underline">Submit Another Inquiry</button>
             </motion.div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form className="space-y-6" onSubmit={async (e) => {
+              e.preventDefault();
+              setIsSubmitting(true);
+              try {
+                const res = await fetch('http://localhost:8080/api/inquiries', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    customerName: formData.name,
+                    customerEmail: formData.email,
+                    customerPhone: formData.phone,
+                    projectType: formData.projectType,
+                    location: formData.location,
+                    initialNotes: formData.notes
+                  })
+                });
+                if (res.ok) {
+                  setSubmitSuccess(true);
+                  setFormData({ name: '', email: '', phone: '', projectType: 'Commercial Build', location: '', notes: '' });
+                }
+              } catch (error) {
+                console.error("Failed to submit inquiry", error);
+              } finally {
+                setIsSubmitting(false);
+              }
+            }}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider text-[#64748b]">Full Name / Company</label>
-                  <input required type="text" className="w-full rounded-md bg-white border border-[#cbd5e1] px-4 py-3 focus:ring-2 focus:ring-primary outline-none text-[#1e293b]" placeholder="e.g. Eco Resort Holdings" value={formData.clientName} onChange={e => setFormData({...formData, clientName: e.target.value})} />
+                  <label className="block text-sm font-semibold text-[#1e293b] mb-2">Full Name</label>
+                  <input type="text" required
+                    value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
+                    className="w-full px-4 py-3 bg-white border border-[#cbd5e1] rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
+                    placeholder="John Doe" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider text-[#64748b]">Email Address</label>
-                  <input required type="email" className="w-full rounded-md bg-white border border-[#cbd5e1] px-4 py-3 focus:ring-2 focus:ring-primary outline-none text-[#1e293b]" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <label className="block text-sm font-semibold text-[#1e293b] mb-2">Work Email</label>
+                  <input type="email" required
+                    value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+                    className="w-full px-4 py-3 bg-white border border-[#cbd5e1] rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
+                    placeholder="john@company.com" />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider text-[#64748b]">Phone Number</label>
-                  <input required type="tel" className="w-full rounded-md bg-white border border-[#cbd5e1] px-4 py-3 focus:ring-2 focus:ring-primary outline-none text-[#1e293b]" placeholder="+94 77 ..." value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                  <label className="block text-sm font-semibold text-[#1e293b] mb-2">Phone Number</label>
+                  <input type="tel" 
+                    value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})}
+                    className="w-full px-4 py-3 bg-white border border-[#cbd5e1] rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
+                    placeholder="+1 (555) 000-0000" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider text-[#64748b]">Interested Service</label>
-                  <select className="w-full rounded-md bg-white border border-[#cbd5e1] px-4 py-3 focus:ring-2 focus:ring-primary outline-none appearance-none text-[#1e293b]" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})}>
-                    <option>Consultancy & Cost Planning</option>
-                    <option>Construction Management</option>
-                    <option>Quality Assurance Audits</option>
+                  <label className="block text-sm font-semibold text-[#1e293b] mb-2">Project Type</label>
+                  <select 
+                    value={formData.projectType} onChange={e => setFormData({...formData, projectType: e.target.value})}
+                    className="w-full px-4 py-3 bg-white border border-[#cbd5e1] rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none"
+                  >
+                    <option>Commercial Build</option>
+                    <option>Residential Complex</option>
+                    <option>Infrastructure</option>
+                    <option>Renovation</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold mb-2 uppercase tracking-wider text-[#64748b]">Project Details</label>
-                <textarea required rows="4" className="w-full rounded-md bg-white border border-[#cbd5e1] px-4 py-3 focus:ring-2 focus:ring-primary outline-none resize-none text-[#1e293b]" placeholder="Describe your project size, location, and specific needs..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                <label className="block text-sm font-semibold text-[#1e293b] mb-2">Project Location</label>
+                <input type="text" 
+                  value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}
+                  className="w-full px-4 py-3 bg-white border border-[#cbd5e1] rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
+                  placeholder="City, State or Address" />
               </div>
 
-              <button type="submit" className="w-full bg-primary text-[#022c22] font-bold py-4 text-sm uppercase tracking-wider rounded-md hover:opacity-90 transition-opacity">
-                Submit Request
+              <div>
+                <label className="block text-sm font-semibold text-[#1e293b] mb-2">Project Details</label>
+                <textarea rows="4" 
+                  value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})}
+                  className="w-full px-4 py-3 bg-white border border-[#cbd5e1] rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none" 
+                  placeholder="Tell us about your requirements, timeline, and budget..."></textarea>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-primary text-slate-900 font-bold py-4 rounded-xl hover:bg-primary/90 transition-all text-lg shadow-lg shadow-primary/20 disabled:opacity-50"
+              >
+                {isSubmitting ? 'Sending...' : 'Submit Request'}
               </button>
             </form>
           )}
