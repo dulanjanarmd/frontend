@@ -15,7 +15,7 @@ const Approvals = () => {
   });
 
   const isClient = currentUser?.role === 'client';
-  const isPM = currentUser?.role === 'pm';
+  const isPM = currentUser?.role === 'project_manager';
 
   const handleSubmit = (e) => {
     e.preventDefault();

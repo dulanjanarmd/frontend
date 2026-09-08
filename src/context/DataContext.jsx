@@ -13,12 +13,12 @@ export const useData = () => {
 
 export const DataProvider = ({ children }) => {
   const { currentUser } = useAuth();
-  const [users, setUsers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [logs, setLogs] = useState([]);
   const [approvals, setApprovals] = useState([]);
   const [consultations, setConsultations] = useState([]);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -30,17 +30,6 @@ export const DataProvider = ({ children }) => {
 
     const loadData = async () => {
       try {
-        const uRes = await fetch('http://localhost:8080/api/users', { headers });
-        if (uRes.ok) {
-          const rawU = await uRes.json();
-          setUsers(rawU.map(u => ({
-            id: `u${u.id}`,
-            name: u.name,
-            email: u.email,
-            role: u.role === 'PROJECT_MANAGER' ? 'pm' : u.role.toLowerCase()
-          })));
-        }
-
         const pRes = await fetch('http://localhost:8080/api/projects', { headers });
         if (pRes.ok) {
           const rawP = await pRes.json();
@@ -48,6 +37,16 @@ export const DataProvider = ({ children }) => {
             ...p,
             progress: p.progressPercentage,
             client: p.client?.name || 'Unknown'
+          })));
+        }
+
+        const uRes = await fetch('http://localhost:8080/api/users', { headers });
+        if (uRes.ok) {
+          const rawU = await uRes.json();
+          setUsers(rawU.map(u => ({
+            ...u,
+            id: `u${u.id}`,
+            role: u.role.toLowerCase()
           })));
         }
 
@@ -104,12 +103,12 @@ export const DataProvider = ({ children }) => {
   const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
 
   const value = {
-    users,
     projects, addProject, updateProject,
     tasks, addTask, updateTask,
     logs, addLog,
     approvals, updateApproval, addApprovalRequest,
-    consultations, addConsultation, updateConsultation
+    consultations, addConsultation, updateConsultation,
+    users
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

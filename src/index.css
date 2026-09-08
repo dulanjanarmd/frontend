@@ -42,27 +42,29 @@
   }
 }
 
-.dark {
-  --color-background: #0f172a;
-  --color-foreground: #f8fafc;
-  
-  --color-card: #1e293b;
-  --color-card-foreground: #f8fafc;
-  
-  --color-primary: #00fa9a;
-  --color-primary-foreground: #022c22;
-  
-  --color-secondary: #334155;
-  --color-secondary-foreground: #f8fafc;
-  
-  --color-muted: #334155;
-  --color-muted-foreground: #94a3b8;
-  
-  --color-accent: #334155;
-  --color-accent-foreground: #f8fafc;
-  
-  --color-border: #334155;
-  --color-input: #334155;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0f172a;
+    --color-foreground: #f8fafc;
+    
+    --color-card: #1e293b;
+    --color-card-foreground: #f8fafc;
+    
+    --color-primary: #00fa9a;
+    --color-primary-foreground: #022c22;
+    
+    --color-secondary: #334155;
+    --color-secondary-foreground: #f8fafc;
+    
+    --color-muted: #334155;
+    --color-muted-foreground: #94a3b8;
+    
+    --color-accent: #334155;
+    --color-accent-foreground: #f8fafc;
+    
+    --color-border: #334155;
+    --color-input: #334155;
+  }
 }
 
 .glass {
@@ -73,9 +75,11 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.dark .glass {
-  background-color: rgba(30, 41, 59, 0.7);
-  border-color: rgba(255, 255, 255, 0.05);
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background-color: rgba(30, 41, 59, 0.7);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .glass-card {
@@ -85,9 +89,11 @@
   border-radius: var(--radius-lg);
 }
 
-.dark .glass-card {
-  background-color: var(--color-card);
-  border-color: var(--color-border);
+@media (prefers-color-scheme: dark) {
+  .glass-card {
+    background-color: var(--color-card);
+    border-color: var(--color-border);
+  }
 }
 
 /* Specific component overrides for the Visibuild theme */

@@ -12,7 +12,7 @@ const Consultations = () => {
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [proposalUrl, setProposalUrl] = useState('');
 
-  const isPM = currentUser?.role === 'pm';
+  const isPM = currentUser?.role === 'project_manager';
   const isCEO = currentUser?.role === 'ceo';
 
   const handleUpdateStatus = (id, newStatus) => {

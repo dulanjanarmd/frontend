@@ -59,7 +59,7 @@ function App() {
         <Route path="logs" element={<Logs />} />
         <Route path="approvals" element={<Approvals />} />
         <Route path="consultations" element={
-          <RequireAuth allowedRoles={['pm', 'ceo', 'admin']}>
+          <RequireAuth allowedRoles={['project_manager', 'ceo', 'admin']}>
             <Consultations />
           </RequireAuth>
         } />

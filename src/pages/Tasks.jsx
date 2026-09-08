@@ -17,7 +17,7 @@ const Tasks = () => {
     dueDate: '',
   });
 
-  const isPM = currentUser?.role === 'pm';
+  const isPM = currentUser?.role === 'pm' || currentUser?.role === 'project_manager';
   const isSiteEngineer = currentUser?.role === 'site_engineer';
   
   // Filter tasks based on role

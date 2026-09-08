@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { UserPlus, Shield, Mail, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const AdminPortal = () => {
   const { users } = useData();
-  const [usersList, setUsersList] = useState([]);
+  const [usersList, setUsersList] = useState([]); // This could be updated if Admin needs to add users directly
 
-  useEffect(() => {
-    setUsersList(users);
-  }, [users]);
+  const displayUsers = users && users.length > 0 ? users : usersList;
 
   return (
     <div className="space-y-6">
@@ -41,7 +39,7 @@ const AdminPortal = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {usersList.map((user, idx) => (
+              {displayUsers.map((user, idx) => (
                 <motion.tr 
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
