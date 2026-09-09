@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
 import ImageCarousel from '../components/ImageCarousel';
-import { useState } from 'react';
 
 const LandingPage = () => {
   const { addConsultation } = useData();
