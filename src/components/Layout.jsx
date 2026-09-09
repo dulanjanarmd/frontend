@@ -55,97 +55,97 @@ const Navbar = () => {
   const roleNav = currentUser ? navItems[currentUser.role] : [];
 
   return (
-    <header className="bg-slate-200  text-slate-800  rounded-b-xl flex flex-col md:flex-row md:items-center justify-between px-6 py-4 mx-4 md:mx-auto md:w-full md:max-w-7xl shadow-sm relative z-50">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <div className="bg-slate-900 w-10 h-10 rounded-md flex items-center justify-center">
-            {/* Logo Icon simulation */}
-            <div className="w-5 h-5 border-4 border-primary rounded-sm relative">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary rounded-full"></div>
-            </div>
-          </div>
-        </div>
-        <button 
-          className="md:hidden text-slate-600 "
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-
-      {/* Desktop Navigation */}
-      <nav className="hidden md:flex space-x-2 items-center flex-1 justify-center">
-        {roleNav.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
-              location.pathname === item.path 
-                ? 'text-primary' 
-                : 'hover:text-slate-500 :text-slate-400'
-            }`}
-          >
-            {item.icon}
-            {item.name}
+    <div className="bg-[#e5e7eb] relative px-4 sm:px-8 z-50 shadow-sm">
+      <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
+        
+        {/* Left Side: Logo and Nav */}
+        <div className="flex items-center space-x-2">
+          <Link to="/portal" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
+            <span className="text-primary font-bold text-xl tracking-tight">Prismo.</span>
           </Link>
-        ))}
-      </nav>
-
-      <div className="hidden md:flex items-center space-x-4 text-sm font-semibold">
-        <div className="flex items-center text-slate-600  mr-2">
-          <User className="w-4 h-4 mr-2" />
-          <span className="font-medium text-xs">{currentUser?.name}</span>
-        </div>
-        <button 
-          onClick={logout}
-          className="bg-primary text-slate-900 px-4 py-2 rounded hover:opacity-90 transition-opacity flex items-center"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          SIGN OUT
-        </button>
-      </div>
-
-      {/* Mobile Navigation */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="md:hidden flex flex-col space-y-4 pt-6 pb-2 overflow-hidden"
-          >
+          <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-medium text-[#4b5563]">
             {roleNav.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
                   location.pathname === item.path 
-                    ? 'text-primary' 
-                    : 'text-slate-600 '
+                    ? 'bg-[#9ca3af]/20 text-[#1e293b]' 
+                    : 'hover:bg-[#9ca3af]/20 hover:text-[#1e293b]'
                 }`}
               >
                 {item.icon}
                 {item.name}
               </Link>
             ))}
-            <div className="border-t border-slate-300  pt-4 flex items-center justify-between px-4">
-               <div className="flex items-center text-slate-600 ">
-                <User className="w-4 h-4 mr-2" />
-                <span className="font-medium text-xs">{currentUser?.name}</span>
-              </div>
-              <button 
-                onClick={logout}
-                className="text-red-500 flex items-center text-sm font-semibold"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                SIGN OUT
-              </button>
+          </nav>
+        </div>
+
+        {/* Right Side: Profile and Actions */}
+        <div className="flex items-center space-x-2">
+          <div className="hidden md:flex items-center bg-[#d1d5db] h-12 rounded-lg p-1 space-x-1 text-sm font-bold">
+            <div className="flex items-center text-[#4b5563] px-4 py-2">
+              <User className="w-4 h-4 mr-2" />
+              <span className="font-medium">{currentUser?.name}</span>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+            <button 
+              onClick={logout}
+              className="px-6 py-2 bg-primary text-[#022c22] rounded-md transition-colors uppercase h-full flex items-center hover:opacity-90"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              SIGN OUT
+            </button>
+          </div>
+          <button 
+            className="md:hidden text-slate-600 bg-[#d1d5db] h-12 w-12 flex items-center justify-center rounded-lg"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden flex flex-col space-y-4 pt-6 pb-2 overflow-hidden"
+            >
+              {roleNav.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
+                    location.pathname === item.path 
+                      ? 'text-primary' 
+                      : 'text-slate-600'
+                  }`}
+                >
+                  {item.icon}
+                  {item.name}
+                </Link>
+              ))}
+              <div className="border-t border-slate-300 pt-4 flex items-center justify-between px-4">
+                <div className="flex items-center text-slate-600">
+                  <User className="w-4 h-4 mr-2" />
+                  <span className="font-medium text-xs">{currentUser?.name}</span>
+                </div>
+                <button 
+                  onClick={logout}
+                  className="text-red-500 flex items-center text-sm font-semibold"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  SIGN OUT
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+    </div>
   );
 };
 

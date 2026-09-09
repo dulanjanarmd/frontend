@@ -32,9 +32,9 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 relative font-sans overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 relative font-sans overflow-y-auto">
       {/* Exact Header matching Landing Page */}
-      <div className="w-full px-4 sm:px-8">
+      <div className="bg-[#e5e7eb] relative px-4 sm:px-8 shadow-sm">
         <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Link to="/" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
