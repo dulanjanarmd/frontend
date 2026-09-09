@@ -265,10 +265,28 @@ const Projects = () => {
 
               <div className="border-t border-border pt-4">
                 <h3 className="text-sm font-bold mb-3">Add New Milestone</h3>
-                <form onSubmit={handleAddMilestone} className="flex gap-2">
-                  <input required type="text" placeholder="Title" className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={newMilestone.title} onChange={e => setNewMilestone({...newMilestone, title: e.target.value})} />
-                  <input required type="date" className="w-40 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={newMilestone.date} onChange={e => setNewMilestone({...newMilestone, date: e.target.value})} />
-                  <button type="submit" className="px-3 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-colors"><Plus className="w-4 h-4" /></button>
+                <form onSubmit={handleAddMilestone} className="space-y-3">
+                  <input
+                    required
+                    type="text"
+                    placeholder="Milestone Title (e.g. Foundation Complete)"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={newMilestone.title}
+                    onChange={e => setNewMilestone({...newMilestone, title: e.target.value})}
+                  />
+                  <input
+                    required
+                    type="date"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={newMilestone.date}
+                    onChange={e => setNewMilestone({...newMilestone, date: e.target.value})}
+                  />
+                  <button
+                    type="submit"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-md hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="w-4 h-4" /> Add Milestone
+                  </button>
                 </form>
               </div>
             </motion.div>

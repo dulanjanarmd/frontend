@@ -39,11 +39,11 @@ const Navbar = () => {
     ],
     site_engineer: [
       { name: 'Dashboard', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
-      { name: 'My Tasks', path: '/portal/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
-      { name: 'Submit Daily Progress', path: '/portal/logs', icon: <Camera className="w-4 h-4 mr-2" /> },
-      { name: 'Report Issue', path: '/portal/issues', icon: <AlertTriangle className="w-4 h-4 mr-2" /> },
-      { name: 'My Projects', path: '/portal/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
-      { name: 'Recent Activity', path: '/portal/activity', icon: <Activity className="w-4 h-4 mr-2" /> },
+      { name: 'Tasks', path: '/portal/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
+      { name: 'Daily Logs', path: '/portal/logs', icon: <Camera className="w-4 h-4 mr-2" /> },
+      { name: 'Issues', path: '/portal/issues', icon: <AlertTriangle className="w-4 h-4 mr-2" /> },
+      { name: 'Projects', path: '/portal/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
+      { name: 'Activity', path: '/portal/activity', icon: <Activity className="w-4 h-4 mr-2" /> },
     ],
     client: [
       { name: 'Dashboard', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },

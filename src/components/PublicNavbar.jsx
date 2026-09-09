@@ -5,8 +5,15 @@ const PublicNavbar = () => {
   const location = useLocation();
 
   return (
-    <header className="py-6 mx-auto w-full max-w-7xl flex flex-col md:flex-row md:items-center justify-between z-50 relative">
-      <div className="flex items-center justify-between w-full md:w-auto">
+    <>
+      {/* Unique Architectural Background Shape for Public Pages */}
+      <div 
+        className="fixed top-0 right-0 w-[60vw] h-[100vh] bg-slate-300 opacity-20 pointer-events-none z-0" 
+        style={{ clipPath: 'polygon(30% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
+      ></div>
+      
+      <header className="py-6 px-4 mx-auto w-full max-w-7xl flex flex-col md:flex-row md:items-center justify-between z-50 relative">
+        <div className="flex items-center justify-between w-full md:w-auto">
         <div className="flex items-center space-x-2">
           <Link to="/" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
             <span className="text-primary font-bold text-xl tracking-tight">Prismo.</span>
@@ -34,6 +41,7 @@ const PublicNavbar = () => {
         </a>
       </div>
     </header>
+    </>
   );
 };
 
