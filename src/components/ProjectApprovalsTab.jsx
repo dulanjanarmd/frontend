@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { CheckCircle2, XCircle, FileText, Send, Clock, RotateCcw, Lock, Plus, X } from 'lucide-react';
+import { CheckCircle2, XCircle, FileText, Send, Clock, RotateCcw, Lock, Plus, X, Paperclip, ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ApprovalDetailModal from './ApprovalDetailModal';
 
@@ -31,8 +31,22 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
     title: '',
     description: '',
     dueDate: '',
-    linkedLogIds: []
+    linkedLogIds: [],
+    attachedDocuments: [],
+    attachedPhotos: []
   });
+
+  const handleFileChange = (e, field) => {
+    const files = Array.from(e.target.files);
+    setFormData(prev => ({ ...prev, [field]: [...prev[field], ...files] }));
+  };
+
+  const removeFile = (field, index) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index)
+    }));
+  };
 
   const isClient = currentUser?.role === 'client';
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
@@ -75,7 +89,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
       }]
     });
     setIsModalOpen(false);
-    setFormData({ title: '', description: '', dueDate: '', linkedLogIds: [] });
+    setFormData({ title: '', description: '', dueDate: '', linkedLogIds: [], attachedDocuments: [], attachedPhotos: [] });
   };
 
   const handleUpdate = (id, updates) => {
@@ -234,6 +248,76 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                     value={formData.dueDate}
                     onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
                   />
+                </div>
+
+                {/* Document Attachments */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                    <Paperclip className="w-4 h-4 text-slate-500" /> Attach Documents
+                    <span className="text-xs text-slate-400 font-normal">(PDF, Word, Excel)</span>
+                  </label>
+                  <label className="flex items-center justify-center w-full border-2 border-dashed border-border rounded-lg py-3 px-4 cursor-pointer hover:border-primary/50 hover:bg-slate-50 transition-colors">
+                    <span className="text-sm text-slate-500">Click to upload documents</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+                      className="hidden"
+                      onChange={e => handleFileChange(e, 'attachedDocuments')}
+                    />
+                  </label>
+                  {formData.attachedDocuments.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {formData.attachedDocuments.map((file, i) => (
+                        <div key={i} className="flex items-center justify-between bg-slate-50 border border-border rounded px-3 py-1.5">
+                          <span className="text-xs text-slate-700 truncate flex items-center gap-1">
+                            <FileText className="w-3 h-3 shrink-0 text-slate-400" /> {file.name}
+                          </span>
+                          <button type="button" onClick={() => removeFile('attachedDocuments', i)} className="text-slate-400 hover:text-red-500 ml-2 shrink-0">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Photo Attachments */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-slate-500" /> Attach Site Photos
+                    <span className="text-xs text-slate-400 font-normal">(JPG, PNG, WEBP)</span>
+                  </label>
+                  <label className="flex items-center justify-center w-full border-2 border-dashed border-border rounded-lg py-3 px-4 cursor-pointer hover:border-primary/50 hover:bg-slate-50 transition-colors">
+                    <span className="text-sm text-slate-500">Click to upload site photos</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => handleFileChange(e, 'attachedPhotos')}
+                    />
+                  </label>
+                  {formData.attachedPhotos.length > 0 && (
+                    <div className="mt-2 grid grid-cols-3 gap-2">
+                      {formData.attachedPhotos.map((file, i) => (
+                        <div key={i} className="relative group">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={file.name}
+                            className="w-full h-20 object-cover rounded-lg border border-border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeFile('attachedPhotos', i)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Link progress logs */}

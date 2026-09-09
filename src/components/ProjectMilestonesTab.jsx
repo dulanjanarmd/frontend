@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { Flag, Plus, Trash2, CheckCircle2, Circle, Edit2, X, Check, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,12 +12,19 @@ const statusColors = {
 
 const ProjectMilestonesTab = ({ project }) => {
   const { updateProject } = useData();
+  const { currentUser } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [newForm, setNewForm] = useState({ name: '', dueDate: '' });
   const [editForm, setEditForm] = useState({ name: '', dueDate: '' });
+  const [loading, setLoading] = useState(false);
 
   const milestones = project.milestones || [];
+
+  const authHeaders = {
+    'Authorization': `Bearer ${currentUser?.token}`,
+    'Content-Type': 'application/json'
+  };
 
   // Sort: incomplete first, then by due date
   const sorted = [...milestones].sort((a, b) => {
@@ -26,31 +34,57 @@ const ProjectMilestonesTab = ({ project }) => {
     return new Date(a.dueDate || a.date || 0) - new Date(b.dueDate || b.date || 0);
   });
 
-  const save = (updated) => updateProject(project.id, { milestones: updated });
-
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newForm.name) return;
-    const updated = [...milestones, {
-      id: `m${Date.now()}`,
-      name: newForm.name,
-      dueDate: newForm.dueDate,
-      status: 'Incomplete'
-    }];
-    save(updated);
-    setNewForm({ name: '', dueDate: '' });
-    setIsAdding(false);
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ name: newForm.name, dueDate: newForm.dueDate || null, status: 'Incomplete' })
+      });
+      if (!res.ok) throw new Error('Failed to add milestone');
+      const saved = await res.json();
+      updateProject(project.id, { milestones: [...milestones, saved] });
+      setNewForm({ name: '', dueDate: '' });
+      setIsAdding(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleToggle = (id) => {
-    const updated = milestones.map(m =>
-      m.id === id ? { ...m, status: m.status === 'Completed' ? 'Incomplete' : 'Completed' } : m
-    );
-    save(updated);
+  const handleToggle = async (id) => {
+    const m = milestones.find(x => x.id === id);
+    if (!m) return;
+    const newStatus = m.status === 'Completed' ? 'Incomplete' : 'Completed';
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
+        method: 'PUT',
+        headers: authHeaders,
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (!res.ok) throw new Error('Failed to update milestone');
+      const updated = await res.json();
+      updateProject(project.id, { milestones: milestones.map(x => x.id === id ? updated : x) });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleDelete = (id) => {
-    save(milestones.filter(m => m.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders
+      });
+      if (!res.ok) throw new Error('Failed to delete milestone');
+      updateProject(project.id, { milestones: milestones.filter(x => x.id !== id) });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const startEdit = (m) => {
@@ -58,13 +92,22 @@ const ProjectMilestonesTab = ({ project }) => {
     setEditForm({ name: m.name || m.title || '', dueDate: m.dueDate || m.date || '' });
   };
 
-  const handleEditSave = (id) => {
-    const updated = milestones.map(m =>
-      m.id === id ? { ...m, name: editForm.name, dueDate: editForm.dueDate } : m
-    );
-    save(updated);
-    setEditingId(null);
+  const handleEditSave = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
+        method: 'PUT',
+        headers: authHeaders,
+        body: JSON.stringify({ name: editForm.name, dueDate: editForm.dueDate || null })
+      });
+      if (!res.ok) throw new Error('Failed to update milestone');
+      const updated = await res.json();
+      updateProject(project.id, { milestones: milestones.map(x => x.id === id ? updated : x) });
+      setEditingId(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
 
   const completedCount = milestones.filter(m => m.status === 'Completed').length;
   const pct = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
@@ -134,8 +177,8 @@ const ProjectMilestonesTab = ({ project }) => {
                 onChange={e => setNewForm({ ...newForm, dueDate: e.target.value })}
               />
               <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button type="submit" className="flex-1 sm:flex-none px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-md hover:opacity-90 transition-opacity text-sm">
-                  + Add
+                <button type="submit" disabled={loading} className="flex-1 sm:flex-none px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-md hover:opacity-90 transition-opacity text-sm disabled:opacity-50">
+                  {loading ? 'Saving...' : '+ Add'}
                 </button>
                 <button type="button" onClick={() => setIsAdding(false)} className="flex-1 sm:flex-none px-3 py-2 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors text-sm text-slate-700">
                   Cancel

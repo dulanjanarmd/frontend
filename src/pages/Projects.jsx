@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const Projects = () => {
-  const { projects, updateProject } = useData();
+  const { projects, updateProject, users } = useData();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   
@@ -55,22 +55,51 @@ const Projects = () => {
     closeModal();
   };
 
-  const handleAddMilestone = (e) => {
+  const handleAddMilestone = async (e) => {
     e.preventDefault();
     if (!newMilestone.title || !newMilestone.date) return;
-    
-    const updatedMilestones = [...activeProject.milestones, { ...newMilestone, id: `m${Date.now()}`, completed: false }];
-    updateProject(activeProject.id, { milestones: updatedMilestones });
-    setActiveProject({ ...activeProject, milestones: updatedMilestones });
-    setNewMilestone({ title: '', date: '' });
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/${activeProject.id}/milestones`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: newMilestone.title, dueDate: newMilestone.date, status: 'Incomplete' })
+      });
+      if (!res.ok) throw new Error('Failed to save milestone');
+      const saved = await res.json();
+      const updatedMilestones = [...(activeProject.milestones || []), saved];
+      updateProject(activeProject.id, { milestones: updatedMilestones });
+      setActiveProject({ ...activeProject, milestones: updatedMilestones });
+      setNewMilestone({ title: '', date: '' });
+    } catch (err) {
+      console.error('Error saving milestone:', err);
+    }
   };
 
-  const toggleMilestone = (milestoneId) => {
-    const updatedMilestones = activeProject.milestones.map(m => 
-      m.id === milestoneId ? { ...m, completed: !m.completed } : m
-    );
-    updateProject(activeProject.id, { milestones: updatedMilestones });
-    setActiveProject({ ...activeProject, milestones: updatedMilestones });
+  const toggleMilestone = async (milestoneId) => {
+    const milestone = activeProject.milestones.find(m => m.id === milestoneId);
+    if (!milestone) return;
+    const newStatus = milestone.status === 'Complete' ? 'Incomplete' : 'Complete';
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/${activeProject.id}/milestones/${milestoneId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (!res.ok) throw new Error('Failed to update milestone');
+      const updated = await res.json();
+      const updatedMilestones = activeProject.milestones.map(m => m.id === milestoneId ? updated : m);
+      updateProject(activeProject.id, { milestones: updatedMilestones });
+      setActiveProject({ ...activeProject, milestones: updatedMilestones });
+    } catch (err) {
+      console.error('Error toggling milestone:', err);
+    }
   };
 
   return (
@@ -176,7 +205,20 @@ const Projects = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Client</label>
-                    <input required type="text" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} />
+                    <select
+                      required
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      value={formData.clientId || ''}
+                      onChange={e => {
+                        const selected = users.find(u => String(u.id) === e.target.value);
+                        setFormData({ ...formData, clientId: e.target.value, client: selected?.name || '' });
+                      }}
+                    >
+                      <option value="" disabled>Select a client</option>
+                      {users.filter(u => u.role === 'client').map(u => (
+                        <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Location</label>
@@ -244,22 +286,25 @@ const Projects = () => {
               <h2 className="text-xl font-bold mb-6 flex items-center"><Flag className="w-5 h-5 mr-2 text-amber-500" /> Manage Milestones</h2>
               
               <div className="space-y-4 mb-6">
-                {activeProject?.milestones.length === 0 ? (
+                {(!activeProject?.milestones || activeProject.milestones.length === 0) ? (
                   <p className="text-sm text-slate-500 text-center py-4">No milestones defined yet.</p>
                 ) : (
-                  activeProject?.milestones.map(m => (
-                    <div key={m.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-slate-50/50 ">
-                      <div className="flex items-center space-x-3">
-                        <button onClick={() => toggleMilestone(m.id)} className="text-slate-400 hover:text-primary transition-colors">
-                          {m.completed ? <CheckCircle2 className="w-5 h-5 text-green-500" /> : <Circle className="w-5 h-5" />}
-                        </button>
-                        <div className={m.completed ? 'opacity-50 line-through' : ''}>
-                          <p className="font-semibold text-sm">{m.title}</p>
-                          <p className="text-xs text-slate-500">{m.date}</p>
+                  activeProject?.milestones.map(m => {
+                    const isComplete = m.status === 'Complete' || m.completed;
+                    return (
+                      <div key={m.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-slate-50/50">
+                        <div className="flex items-center space-x-3">
+                          <button onClick={() => toggleMilestone(m.id)} className="text-slate-400 hover:text-primary transition-colors">
+                            {isComplete ? <CheckCircle2 className="w-5 h-5 text-green-500" /> : <Circle className="w-5 h-5" />}
+                          </button>
+                          <div className={isComplete ? 'opacity-50 line-through' : ''}>
+                            <p className="font-semibold text-sm">{m.name || m.title}</p>
+                            <p className="text-xs text-slate-500">{m.dueDate || m.date}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

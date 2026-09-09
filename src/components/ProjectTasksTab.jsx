@@ -59,17 +59,52 @@ const ProjectTasksTab = ({ projectId, project }) => {
     });
   }, [projectTasks, statusFilter, assigneeFilter, isSiteEngineer, currentUser]);
 
-  const handleSubmit = (e) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addTask({
-      ...formData,
-      projectId,
-      milestoneId: formData.milestoneId || null,
-      status: 'To Do',
-      evidence: null
-    });
-    setIsModalOpen(false);
-    setFormData({ title: '', description: '', assignedTo: '', priority: 'Medium', dueDate: '', milestoneId: '' });
+    setSubmitting(true);
+
+    // Extract raw user ID (strip the 'u' prefix added by DataContext)
+    const rawAssigneeId = formData.assignedTo.toString().replace(/^u/, '');
+
+    try {
+      const res = await fetch('http://localhost:8080/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          priority: formData.priority,
+          dueDate: formData.dueDate || null,
+          projectId: projectId,
+          assigneeId: rawAssigneeId
+        })
+      });
+
+      if (!res.ok) throw new Error('Failed to create task');
+      const saved = await res.json();
+
+      // Add to local state with mapped fields for compatibility
+      addTask({
+        ...saved,
+        id: saved.id,
+        projectId: `p${saved.project?.id || projectId}`,
+        assignedTo: `u${saved.assignee?.id || rawAssigneeId}`,
+        evidence: saved.completionEvidence || null
+      });
+
+      setIsModalOpen(false);
+      setFormData({ title: '', description: '', assignedTo: '', priority: 'Medium', dueDate: '', milestoneId: '' });
+    } catch (err) {
+      console.error('Error creating task:', err);
+      alert('Failed to save task. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Count per column
@@ -264,8 +299,10 @@ const ProjectTasksTab = ({ projectId, project }) => {
                 </div>
 
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Create & Assign</button>
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-md transition-colors">Cancel</button>
+                  <button type="submit" disabled={submitting} className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 disabled:opacity-50">
+                    {submitting ? 'Saving...' : 'Create & Assign'}
+                  </button>
                 </div>
               </form>
             </motion.div>
