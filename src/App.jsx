@@ -15,12 +15,12 @@ import ResetPassword from './pages/ResetPassword';
 import AdminPortal from './pages/AdminPortal';
 import Consultations from './pages/Consultations';
 import Issues from './pages/Issues';
+import ServicesPage from './pages/ServicesPage';
+import PortfolioPage from './pages/PortfolioPage';
+import AboutPage from './pages/AboutPage';
 import RecentActivityPage from './pages/RecentActivityPage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
-import ProductPage from './pages/ProductPage';
-import SolutionPage from './pages/SolutionPage';
-import ResourcesPage from './pages/ResourcesPage';
 
 const RequireAuth = ({ children, allowedRoles }) => {
   const { currentUser } = useAuth();
@@ -52,9 +52,9 @@ function App() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/product" element={<ProductPage />} />
-      <Route path="/solution" element={<SolutionPage />} />
-      <Route path="/resources" element={<ResourcesPage />} />
+      <Route path="/services" element={<ServicesPage />} />
+      <Route path="/portfolio" element={<PortfolioPage />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route path="/login" element={currentUser ? <Navigate to="/portal" replace /> : <Login />} />
       <Route path="/register" element={currentUser ? <Navigate to="/portal" replace /> : <Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
