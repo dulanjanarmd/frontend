@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
 import ImageCarousel from '../components/ImageCarousel';
+import PublicNavbar from '../components/PublicNavbar';
 
 const LandingPage = () => {
   const { addConsultation } = useData();
@@ -37,29 +38,8 @@ const LandingPage = () => {
       
       {/* Top Section with light grey background and rounded bottom */}
       <div className="bg-[#e5e7eb] rounded-b-[3rem] pb-0 relative px-4 sm:px-8">
-        
         {/* Navbar */}
-        <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Link to="/" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
-              <span className="text-primary font-bold text-xl tracking-tight">Prismo.</span>
-            </Link>
-            <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-medium text-[#4b5563]">
-              <div className="px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center">Product <span className="ml-1 text-[10px]">▼</span></div>
-              <div className="px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center">Solution <span className="ml-1 text-[10px]">▼</span></div>
-              <div className="px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center">Resources <span className="ml-1 text-[10px]">▼</span></div>
-            </nav>
-          </div>
-          
-          <div className="flex items-center bg-[#d1d5db] h-12 rounded-lg p-1 space-x-1 text-sm font-bold">
-            <Link to="/login" className="px-6 py-2 text-[#4b5563] hover:text-[#1e293b] transition-colors uppercase">
-              Sign In
-            </Link>
-            <a href="#contact" className="px-6 py-2 bg-primary text-[#022c22] rounded-md transition-colors uppercase h-full flex items-center hover:opacity-90">
-              Book a Demo
-            </a>
-          </div>
-        </header>
+        <PublicNavbar />
 
         {/* Hero Content matching the screenshot layout */}
         <div className="max-w-4xl mx-auto text-center pt-8 pb-4">
