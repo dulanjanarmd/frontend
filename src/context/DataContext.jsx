@@ -120,6 +120,21 @@ export const DataProvider = ({ children }) => {
     }
   };
   const updateProject = (id, updates) => setProjects(projects.map(p => p.id === id ? { ...p, ...updates } : p));
+  const deleteProject = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/projects/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to delete project');
+      setProjects(projects.filter(p => p.id !== id));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
   
   const addTask = (task) => setTasks([...tasks, { ...task, id: `t${Date.now()}` }]);
   const updateTask = (id, updates) => setTasks(tasks.map(t => t.id === id ? { ...t, ...updates } : t));
@@ -136,7 +151,7 @@ export const DataProvider = ({ children }) => {
   const updateIssue = (id, updates) => setIssues(issues.map(i => i.id === id ? { ...i, ...updates } : i));
 
   const value = {
-    projects, addProject, updateProject,
+    projects, addProject, updateProject, deleteProject,
     tasks, addTask, updateTask,
     logs, addLog,
     approvals, updateApproval, addApprovalRequest,

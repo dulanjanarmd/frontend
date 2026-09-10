@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
-import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText } from 'lucide-react';
+import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const SummaryCard = ({ icon: Icon, label, value, colorClass }) => (
   <div className="glass-card p-4 flex items-center space-x-4">
@@ -16,7 +17,8 @@ const SummaryCard = ({ icon: Icon, label, value, colorClass }) => (
 );
 
 const ProjectOverviewTab = ({ project }) => {
-  const { updateProject, tasks, approvals, logs, users } = useData();
+  const { updateProject, deleteProject, tasks, approvals, logs, users } = useData();
+  const navigate = useNavigate();
 
   const [modalType, setModalType] = useState(null);
   const [formData, setFormData] = useState({
@@ -54,6 +56,18 @@ const ProjectOverviewTab = ({ project }) => {
     e.preventDefault();
     updateProject(project.id, { status: statusData.status, progress: parseInt(statusData.progress, 10) });
     closeModal();
+  };
+
+  const handleDeleteProject = async () => {
+    if (window.confirm(`Are you sure you want to completely delete "${project.name}"? This action cannot be undone.`)) {
+      try {
+        await deleteProject(project.id);
+        navigate('/portal/projects');
+      } catch (err) {
+        console.error(err);
+        alert('Failed to delete project. Please check if there are any dependent records.');
+      }
+    }
   };
 
   // Summary stats
@@ -128,13 +142,22 @@ const ProjectOverviewTab = ({ project }) => {
           <div className="glass-card p-6">
             <div className="flex justify-between items-center border-b border-border pb-4 mb-4">
               <h2 className="text-xl font-bold">Project Details</h2>
-              <button
-                onClick={() => openModal('edit')}
-                className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 :bg-indigo-900/30 rounded-md transition-colors"
-                title="Edit Details"
-              >
-                <Edit2 className="w-4 h-4" />
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => openModal('edit')}
+                  className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 :bg-indigo-900/30 rounded-md transition-colors"
+                  title="Edit Details"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleDeleteProject}
+                  className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 :bg-red-900/30 rounded-md transition-colors"
+                  title="Delete Project"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <div className="space-y-4">
               <div>

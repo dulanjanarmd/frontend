@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight } from 'lucide-react';
+import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const Projects = () => {
-  const { projects, updateProject, users } = useData();
+  const { projects, updateProject, deleteProject, users } = useData();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   
@@ -24,12 +24,26 @@ const Projects = () => {
   const [newMilestone, setNewMilestone] = useState({ title: '', date: '' });
 
   const openModal = (type, project = null) => {
-    setModalType(type);
     setActiveProject(project);
+    setModalType(type);
     if (type === 'edit' && project) {
-      setFormData(project);
+      setFormData({
+        name: project.name, client: project.client, clientId: project.clientId || '', location: project.location,
+        startDate: project.startDate, endDate: project.endDate, description: project.description
+      });
     } else if (type === 'status' && project) {
       setStatusData({ status: project.status, progress: project.progress });
+    }
+  };
+
+  const handleDeleteProject = async (project) => {
+    if (window.confirm(`Are you sure you want to completely delete the project "${project.name}"? This action cannot be undone.`)) {
+      try {
+        await deleteProject(project.id);
+      } catch (err) {
+        console.error(err);
+        alert('Failed to delete project. Please check if there are any dependent records.');
+      }
     }
   };
 
@@ -178,6 +192,9 @@ const Projects = () => {
                           </button>
                           <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 :bg-indigo-900/30 rounded-md transition-colors" title="Edit Project">
                             <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDeleteProject(project)} className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 :bg-red-900/30 rounded-md transition-colors" title="Delete Project">
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </>
                       )}
