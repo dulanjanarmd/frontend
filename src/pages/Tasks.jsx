@@ -35,8 +35,9 @@ const Tasks = () => {
   const isSiteEngineer = currentUser?.role === 'site_engineer';
 
   const displayTasks = useMemo(() => {
+    const userId = String(currentUser.id);
     let list = isSiteEngineer
-      ? tasks.filter(t => t.assignedTo === currentUser.id || t.assignedTo === `u${currentUser.id}`)
+      ? tasks.filter(t => String(t.assignedTo || '').replace('u', '') === userId || String(t.assignedTo) === userId || `u${userId}` === String(t.assignedTo))
       : tasks;
 
     if (search) list = list.filter(t => t.title?.toLowerCase().includes(search.toLowerCase()));
@@ -49,7 +50,10 @@ const Tasks = () => {
 
   const statusCounts = ['To Do', 'In Progress', 'Completed', 'Reopened', 'Closed'].reduce((acc, s) => {
     acc[s] = tasks.filter(t => {
-      if (isSiteEngineer) return t.assignedTo === currentUser.id && t.status === s;
+      if (isSiteEngineer) {
+        const userId = String(currentUser.id);
+        return (String(t.assignedTo || '').replace('u', '') === userId || String(t.assignedTo) === userId) && t.status === s;
+      }
       return t.status === s;
     }).length;
     return acc;
@@ -164,16 +168,23 @@ const Tasks = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {displayTasks.map((task, idx) => {
-                  const project = projects.find(p =>
-                    String(p.id) === String(task.projectId) || p.id === `p${task.projectId}`
-                  );
-                  const assignee = users.find(u => u.id === task.assignedTo || `u${u.id}` === task.assignedTo);
-                  const needsReview = isPM && task.status === 'Completed';
+                  {displayTasks.map((task, idx) => {
+                    const project = projects.find(p =>
+                      String(p.id) === String(task.projectId).replace('p', '') || `p${p.id}` === String(task.projectId)
+                    );
+                    const assignee = users.find(u => u.id === task.assignedTo || `u${u.id}` === task.assignedTo);
+                    const needsReview = isPM && task.status === 'Completed';
 
-                  return (
-                    <motion.tr
-                      key={task.id}
+                    console.log('DEBUG TASKS ROW:', {
+                      taskId: task.id,
+                      taskMilestoneId: task.milestoneId,
+                      projectId: project?.id,
+                      milestones: project?.milestones
+                    });
+
+                    return (
+                      <motion.tr
+                        key={task.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: idx * 0.03 }}
@@ -202,7 +213,7 @@ const Tasks = () => {
                         ) : '—'}
                       </td>
                       <td className="px-6 py-4 text-slate-500 text-sm">
-                        {project?.milestones?.find(m => m.id === task.milestoneId)?.name || project?.milestones?.find(m => m.id === task.milestoneId)?.title || '—'}
+                        {task.milestoneName || (projects?.find(p => String(p.id) === String(task.projectId).replace('p', ''))?.milestones?.find(m => String(m.id) === String(task.milestoneId)?.replace('m', ''))?.name) || '—'}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-0.5 text-xs font-semibold rounded ${PRIORITY_STYLES[task.priority] || ''}`}>

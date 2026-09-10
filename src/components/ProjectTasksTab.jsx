@@ -81,7 +81,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
           priority: formData.priority,
           dueDate: formData.dueDate || null,
           projectId: projectId,
-          assigneeId: rawAssigneeId
+          assigneeId: rawAssigneeId,
+          milestoneId: formData.milestoneId ? formData.milestoneId.toString().replace('m', '') : null
         })
       });
 
@@ -89,11 +90,21 @@ const ProjectTasksTab = ({ projectId, project }) => {
       const saved = await res.json();
 
       // Add to local state with mapped fields for compatibility
+      const mapTaskStatus = (s) => {
+        if (s === 'TO_DO') return 'To Do';
+        if (s === 'IN_PROGRESS') return 'In Progress';
+        if (s === 'COMPLETED') return 'Completed';
+        return s || 'To Do';
+      };
+
       addTask({
         ...saved,
         id: saved.id,
+        status: mapTaskStatus(saved.status),
         projectId: `p${saved.project?.id || projectId}`,
         assignedTo: `u${saved.assignee?.id || rawAssigneeId}`,
+        milestoneId: saved.milestone?.id || formData.milestoneId || null,
+        milestoneName: saved.milestone?.name || saved.milestone?.title || (formData.milestoneId ? milestones.find(m => String(m.id) === String(formData.milestoneId).replace('m', ''))?.name : null),
         evidence: saved.completionEvidence || null
       });
 

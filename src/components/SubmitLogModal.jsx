@@ -70,7 +70,11 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
 
   if (!isOpen) return null;
 
-  const projectTasks = assignedTasks.filter(t => t.projectId === formData.projectId);
+  // Normalize both sides — project options have raw id (e.g. 3), tasks have projectId 'p3'
+  const selectedProjectId = String(formData.projectId || '').replace('p', '');
+  const projectTasks = selectedProjectId
+    ? assignedTasks.filter(t => String(t.projectId || '').replace('p', '') === selectedProjectId)
+    : [];
 
   return (
     <AnimatePresence>
@@ -163,20 +167,24 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
               />
             </div>
 
-            {/* Related Task */}
-            {projectTasks.length > 0 && (
+            {/* Related Task — always show when project is selected */}
+            {formData.projectId && (
               <div>
                 <label className="block text-sm font-medium mb-1">Related Task (Optional)</label>
-                <select
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                  value={formData.taskId}
-                  onChange={e => setFormData({ ...formData, taskId: e.target.value })}
-                >
-                  <option value="">None</option>
-                  {projectTasks.map(t => (
-                    <option key={t.id} value={t.id}>{t.title} ({t.status})</option>
-                  ))}
-                </select>
+                {projectTasks.length > 0 ? (
+                  <select
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={formData.taskId}
+                    onChange={e => setFormData({ ...formData, taskId: e.target.value })}
+                  >
+                    <option value="">— None —</option>
+                    {projectTasks.map(t => (
+                      <option key={t.id} value={t.id}>{t.title} ({t.status})</option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-xs text-slate-400 italic px-1">No tasks assigned for this project yet.</p>
+                )}
               </div>
             )}
 

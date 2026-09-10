@@ -15,13 +15,13 @@ const SiteEngineerDashboard = () => {
   const [isSubmitLogOpen, setIsSubmitLogOpen] = useState(false);
   const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
 
-  // 1. My Tasks (Assigned to SE)
+  // Task's assignedTo is 'u3' (prefixed in DataContext), but currentUser.id is raw number 3
   const myTasks = useMemo(() => {
-    return tasks.filter(t => 
-      String(t.assignee) === String(currentUser?.id) || 
-      `u${t.assignee}` === currentUser?.id ||
-      t.assignee === currentUser?.name
-    );
+    const userId = String(currentUser?.id);
+    return tasks.filter(t => {
+      const assignedTo = String(t.assignedTo || '').replace('u', '');
+      return assignedTo === userId || String(t.assignedTo) === userId || `u${userId}` === String(t.assignedTo);
+    });
   }, [tasks, currentUser]);
 
   const openTasks = myTasks.filter(t => t.status === 'To Do' || t.status === 'In Progress');
@@ -63,7 +63,7 @@ const SiteEngineerDashboard = () => {
   const recentActivities = useMemo(() => {
     const activities = [];
     myTasks.forEach(task => {
-      const project = projects.find(p => p.id === task.projectId);
+      const project = projects.find(p => String(p.id) === String(task.projectId).replace('p', '') || `p${p.id}` === String(task.projectId));
       if (project) {
         activities.push({
           type: 'task',
@@ -77,7 +77,7 @@ const SiteEngineerDashboard = () => {
 
     logs.forEach(log => {
       if (String(log.submittedBy) === String(currentUser?.id) || `u${log.submittedBy}` === currentUser?.id) {
-        const project = projects.find(p => p.id === log.projectId);
+        const project = projects.find(p => String(p.id) === String(log.projectId).replace('p', '') || `p${p.id}` === String(log.projectId));
         if (project) {
           activities.push({
             type: 'log',
@@ -148,27 +148,6 @@ const SiteEngineerDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-lg font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button 
-            onClick={() => setIsSubmitLogOpen(true)}
-            className="flex items-center justify-center gap-3 p-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all shadow-md hover:shadow-lg shadow-blue-500/20 font-semibold"
-          >
-            <Camera className="w-5 h-5" />
-            + Submit Daily Progress
-          </button>
-          
-          <button 
-            onClick={() => setIsReportIssueOpen(true)}
-            className="flex items-center justify-center gap-3 p-4 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all shadow-md hover:shadow-lg shadow-red-500/20 font-semibold"
-          >
-            <AlertTriangle className="w-5 h-5" />
-            + Report Issue
-          </button>
-        </div>
-      </div>
 
       {/* Active Tasks List */}
       <div>
@@ -195,6 +174,7 @@ const SiteEngineerDashboard = () => {
                   <tr>
                     <th className="px-4 py-3 font-medium">Task Title</th>
                     <th className="px-4 py-3 font-medium">Project</th>
+                    <th className="px-4 py-3 font-medium">Milestone</th>
                     <th className="px-4 py-3 font-medium">Priority</th>
                     <th className="px-4 py-3 font-medium">Status</th>
                     <th className="px-4 py-3 font-medium">Due Date</th>
@@ -203,11 +183,12 @@ const SiteEngineerDashboard = () => {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {openTasks.slice(0, 5).map(task => {
-                    const project = projects.find(p => p.id === task.projectId);
+                    const project = projects.find(p => String(p.id) === String(task.projectId).replace('p', '') || `p${p.id}` === String(task.projectId));
                     return (
                       <tr key={task.id} className="hover:bg-slate-50/50 :bg-slate-800/30 transition-colors">
                         <td className="px-4 py-3 font-medium text-slate-900 ">{task.title}</td>
                         <td className="px-4 py-3 text-slate-600 ">{project?.name || '—'}</td>
+                        <td className="px-4 py-3 text-slate-600 ">{task.milestoneName || (projects?.find(p => String(p.id) === String(task.projectId).replace('p', ''))?.milestones?.find(m => String(m.id) === String(task.milestoneId)?.replace('m', ''))?.name) || '—'}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-0.5 text-xs font-semibold rounded-md border ${
                             task.priority === 'High' ? 'bg-red-50 text-red-700 border-red-200' :
@@ -247,8 +228,8 @@ const SiteEngineerDashboard = () => {
       <SubmitLogModal 
         isOpen={isSubmitLogOpen} 
         onClose={() => setIsSubmitLogOpen(false)} 
-        assignedProjects={myProjects}
-        assignedTasks={myTasks}
+        assignedProjects={myProjects.length > 0 ? myProjects : projects}
+        assignedTasks={tasks}
       />
       
       <ReportIssueModal

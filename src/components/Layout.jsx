@@ -43,7 +43,6 @@ const Navbar = () => {
       { name: 'Daily Logs', path: '/portal/logs', icon: <Camera className="w-4 h-4 mr-2" /> },
       { name: 'Issues', path: '/portal/issues', icon: <AlertTriangle className="w-4 h-4 mr-2" /> },
       { name: 'Projects', path: '/portal/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
-      { name: 'Activity', path: '/portal/activity', icon: <Activity className="w-4 h-4 mr-2" /> },
     ],
     client: [
       { name: 'Dashboard', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },

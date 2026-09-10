@@ -76,11 +76,12 @@ const Logs = () => {
 
       <div className="grid grid-cols-1 gap-6">
         {logs.map(log => {
-          const project = projects.find(p => p.id === log.projectId);
+          const project = projects.find(p => String(p.id) === String(log.projectId).replace('p', ''));
           // If old mock data format (array of strings), convert to object
-          const formattedPhotos = typeof log.photos[0] === 'string' 
-            ? log.photos.map(p => ({ url: p, caption: 'Progress photo' })) 
-            : log.photos;
+          const safePhotos = log.photos || [];
+          const formattedPhotos = safePhotos.length > 0 && typeof safePhotos[0] === 'string'
+            ? safePhotos.map(p => ({ url: p, caption: 'Progress photo' }))
+            : safePhotos;
 
           return (
             <motion.div 
@@ -111,7 +112,7 @@ const Logs = () => {
                   </div>
                   <div className="col-span-2">
                     <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-semibold">Submitted By</p>
-                    <p className="font-medium text-slate-800  capitalize">{log.submittedBy.replace('_', ' ')}</p>
+                     <p className="font-medium text-slate-800  capitalize">{typeof log.submittedBy === 'string' && log.submittedBy.includes('_') ? log.submittedBy.replace(/_/g, ' ') : (log.siteEngineer?.name || String(log.submittedBy || 'Unknown'))}</p>
                   </div>
                 </div>
 

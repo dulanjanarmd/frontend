@@ -54,10 +54,19 @@ export const DataProvider = ({ children }) => {
         const tRes = await fetch('http://localhost:8080/api/tasks', { headers });
         if (tRes.ok) {
           const rawT = await tRes.json();
+          const mapTaskStatus = (s) => {
+            if (s === 'TO_DO') return 'To Do';
+            if (s === 'IN_PROGRESS') return 'In Progress';
+            if (s === 'COMPLETED') return 'Completed';
+            return s || 'To Do';
+          };
           setTasks(rawT.map(t => ({
             ...t,
+            status: mapTaskStatus(t.status),
             projectId: `p${t.project?.id}`,
             assignedTo: `u${t.assignee?.id}`,
+            milestoneId: t.milestone?.id,
+            milestoneName: t.milestone?.name || t.milestone?.title || null,
             evidence: t.completionEvidence
           })));
         }
@@ -68,7 +77,8 @@ export const DataProvider = ({ children }) => {
           setLogs(rawL.map(l => ({
             ...l,
             projectId: `p${l.project?.id}`,
-            submittedBy: `u${l.siteEngineer?.id}`
+            submittedBy: `u${l.siteEngineer?.id}`,
+            photos: l.photos || []
           })));
         }
 
@@ -139,7 +149,43 @@ export const DataProvider = ({ children }) => {
   const addTask = (task) => setTasks([...tasks, { ...task, id: `t${Date.now()}` }]);
   const updateTask = (id, updates) => setTasks(tasks.map(t => t.id === id ? { ...t, ...updates } : t));
 
-  const addLog = (log) => setLogs([...logs, { ...log, id: `l${Date.now()}` }]);
+  const addLog = async (log) => {
+    try {
+      const projectId = String(log.projectId).replace('p', '');
+      const body = {
+        date: log.date,
+        weather: log.weather,
+        manpower: log.manpower,
+        workDone: log.workDone,
+        percentageCompleted: log.percentageCompleted,
+        issues: log.issues || null,
+        projectId: parseInt(projectId)
+      };
+      const res = await fetch(`http://localhost:8080/api/progress?projectId=${projectId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const newLog = await res.json();
+        setLogs(prev => [...prev, {
+          ...newLog,
+          projectId: `p${newLog.project?.id}`,
+          submittedBy: `u${newLog.siteEngineer?.id}`,
+          photos: log.photos || []
+        }]);
+      } else {
+        // Fallback to local state if backend fails
+        setLogs(prev => [...prev, { ...log, id: `l${Date.now()}`, photos: log.photos || [] }]);
+      }
+    } catch (err) {
+      console.error('Failed to save log:', err);
+      setLogs(prev => [...prev, { ...log, id: `l${Date.now()}`, photos: log.photos || [] }]);
+    }
+  };
 
   const updateApproval = (id, updates) => setApprovals(approvals.map(a => a.id === id ? { ...a, ...updates } : a));
   const addApprovalRequest = (request) => setApprovals([...approvals, { ...request, id: `a${Date.now()}` }]);
