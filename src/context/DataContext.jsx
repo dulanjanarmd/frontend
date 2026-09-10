@@ -202,6 +202,76 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const updateLog = async (id, updatedLog) => {
+    try {
+      const projectId = String(updatedLog.projectId).replace('p', '');
+      const rawId = String(id).replace('l', '');
+      const body = {
+        date: updatedLog.date,
+        weather: updatedLog.weather,
+        manpower: updatedLog.manpower,
+        workDone: updatedLog.workDone,
+        percentageCompleted: updatedLog.percentageCompleted,
+        issues: updatedLog.issues || null,
+        equipmentUsed: updatedLog.equipmentUsed || null,
+        materialsDelivered: updatedLog.materialsDelivered || null,
+        safetyIncidents: updatedLog.safetyIncidents || null,
+        delayHours: updatedLog.delayHours ? parseInt(updatedLog.delayHours) : null,
+        temperature: updatedLog.temperature ? parseFloat(updatedLog.temperature) : null,
+        projectId: parseInt(projectId),
+        photos: updatedLog.photos ? updatedLog.photos.map(p => ({
+          fileUrl: p.url || p.fileUrl,
+          caption: p.caption
+        })) : []
+      };
+      
+      let url = `http://localhost:8080/api/progress/${rawId}`;
+      if (updatedLog.taskId) {
+        url += `?taskId=${String(updatedLog.taskId).replace('t', '')}`;
+      }
+
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const savedLog = await res.json();
+        setLogs(logs.map(l => l.id === id ? {
+          ...savedLog,
+          projectId: `p${savedLog.project?.id}`,
+          submittedBy: `u${savedLog.siteEngineer?.id}`,
+          photos: updatedLog.photos || []
+        } : l));
+      } else {
+        setLogs(logs.map(l => l.id === id ? { ...l, ...updatedLog } : l));
+      }
+    } catch (err) {
+      console.error('Failed to update log:', err);
+      setLogs(logs.map(l => l.id === id ? { ...l, ...updatedLog } : l));
+    }
+  };
+
+  const deleteLog = async (id) => {
+    try {
+      const rawId = String(id).replace('l', '');
+      await fetch(`http://localhost:8080/api/progress/${rawId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      setLogs(logs.filter(l => l.id !== id));
+    } catch (err) {
+      console.error('Failed to delete log:', err);
+      setLogs(logs.filter(l => l.id !== id));
+    }
+  };
+
+
   const updateApproval = (id, updates) => setApprovals(approvals.map(a => a.id === id ? { ...a, ...updates } : a));
   const addApprovalRequest = (request) => setApprovals([...approvals, { ...request, id: `a${Date.now()}` }]);
 
@@ -214,7 +284,7 @@ export const DataProvider = ({ children }) => {
   const value = {
     projects, addProject, updateProject, deleteProject,
     tasks, addTask, updateTask,
-    logs, addLog,
+    logs, addLog, updateLog, deleteLog,
     approvals, updateApproval, addApprovalRequest,
     consultations, addConsultation, updateConsultation,
     users,

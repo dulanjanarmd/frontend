@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Camera, Plus, X, UploadCloud, AlertTriangle, MessageSquare, Download, Eye, LayoutList } from 'lucide-react';
+import { Camera, Plus, X, UploadCloud, AlertTriangle, MessageSquare, Download, Eye, LayoutList, Edit, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Logs = () => {
-  const { logs, addLog, projects, tasks } = useData();
+  const { logs, addLog, updateLog, deleteLog, projects, tasks } = useData();
   const { currentUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -27,6 +27,34 @@ const Logs = () => {
   });
 
   const [selectedLog, setSelectedLog] = useState(null);
+  const [editingLogId, setEditingLogId] = useState(null);
+
+  const openEditModal = (log) => {
+    setEditingLogId(log.id);
+    setFormData({
+      projectId: String(log.projectId).replace('p', ''),
+      taskId: log.task ? String(log.task.id) : '',
+      date: log.date,
+      weather: log.weather,
+      temperature: log.temperature || '',
+      manpower: log.manpower,
+      percentageCompleted: log.percentageCompleted,
+      workDone: log.workDone,
+      equipmentUsed: log.equipmentUsed || '',
+      materialsDelivered: log.materialsDelivered || '',
+      safetyIncidents: log.safetyIncidents || '',
+      delayHours: log.delayHours || '',
+      issues: log.issues || '',
+      photos: log.photos || []
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this log?")) {
+      deleteLog(id);
+    }
+  };
 
   const exportToCSV = () => {
     if (logs.length === 0) return;
@@ -119,12 +147,22 @@ const Logs = () => {
       caption: 'General site overview'
     }];
     
-    addLog({
-      ...formData,
-      submittedBy: currentUser.id,
-      photos: finalPhotos
-    });
+    if (editingLogId) {
+      updateLog(editingLogId, {
+        ...formData,
+        submittedBy: currentUser.id,
+        photos: finalPhotos
+      });
+    } else {
+      addLog({
+        ...formData,
+        submittedBy: currentUser.id,
+        photos: finalPhotos
+      });
+    }
+    
     setIsModalOpen(false);
+    setEditingLogId(null);
     setFormData({ 
       projectId: '', taskId: '', date: new Date().toISOString().split('T')[0], 
       weather: 'Sunny', temperature: '', manpower: '', percentageCompleted: '', 
@@ -158,8 +196,8 @@ const Logs = () => {
           <p className="text-slate-500 mt-1">Daily field capture and issue reporting.</p>
         </div>
         <div className="flex space-x-3">
-          <button onClick={exportToCSV} className="btn-secondary flex items-center bg-white border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
-            <Download className="w-4 h-4 mr-2" />
+          <button onClick={exportToCSV} className="flex items-center px-4 py-2 bg-slate-200/50 hover:bg-slate-200 text-slate-700 rounded-md font-medium transition-colors">
+            <Download className="w-4 h-4 mr-2 text-primary" />
             Export CSV
           </button>
           {isSiteEngineer && (
@@ -206,9 +244,21 @@ const Logs = () => {
                     <td className="py-3 px-4 text-slate-700">{log.manpower}</td>
                     <td className="py-3 px-4 text-green-600 font-semibold">{log.percentageCompleted}%</td>
                     <td className="py-3 px-4">
-                      <button onClick={() => setSelectedLog(log)} className="text-primary hover:text-primary-dark font-medium flex items-center text-sm">
-                        <Eye className="w-4 h-4 mr-1" /> View
-                      </button>
+                      <div className="flex items-center space-x-3">
+                        <button onClick={() => setSelectedLog(log)} className="text-primary hover:text-primary-dark font-medium flex items-center text-sm transition-colors" title="View Details">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        {isSiteEngineer && (
+                          <>
+                            <button onClick={() => openEditModal(log)} className="text-amber-500 hover:text-amber-600 transition-colors" title="Edit Log">
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleDelete(log.id)} className="text-red-500 hover:text-red-600 transition-colors" title="Delete Log">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </motion.tr>
                 );
@@ -236,13 +286,22 @@ const Logs = () => {
               className="bg-white  border border-border w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto rounded shadow-2xl"
             >
               <button 
-                onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 :text-slate-200 transition-colors"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingLogId(null);
+                  setFormData({ 
+                    projectId: '', taskId: '', date: new Date().toISOString().split('T')[0], 
+                    weather: 'Sunny', temperature: '', manpower: '', percentageCompleted: '', 
+                    workDone: '', equipmentUsed: '', materialsDelivered: '', 
+                    safetyIncidents: '', delayHours: '', issues: '', photos: [] 
+                  });
+                }}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
               
-              <h2 className="text-2xl font-bold text-slate-900  mb-6">Submit Daily Progress Log</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">{editingLogId ? 'Edit Daily Progress Log' : 'Submit Daily Progress Log'}</h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 
@@ -368,8 +427,17 @@ const Logs = () => {
                 </div>
                 
                 <div className="pt-4 flex justify-end space-x-3 border-t border-border">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 font-semibold text-slate-600  hover:bg-slate-100 :bg-slate-800 rounded transition-colors">Cancel</button>
-                  <button type="submit" className="btn-primary">Submit Daily Log</button>
+                  <button type="button" onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingLogId(null);
+                    setFormData({ 
+                      projectId: '', taskId: '', date: new Date().toISOString().split('T')[0], 
+                      weather: 'Sunny', temperature: '', manpower: '', percentageCompleted: '', 
+                      workDone: '', equipmentUsed: '', materialsDelivered: '', 
+                      safetyIncidents: '', delayHours: '', issues: '', photos: [] 
+                    });
+                  }} className="px-4 py-2 font-semibold text-slate-600 hover:bg-slate-100 rounded transition-colors">Cancel</button>
+                  <button type="submit" className="btn-primary">{editingLogId ? 'Update Log' : 'Submit Daily Log'}</button>
                 </div>
               </form>
             </motion.div>
