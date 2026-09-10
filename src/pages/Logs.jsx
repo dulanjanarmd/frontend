@@ -20,7 +20,36 @@ const Logs = () => {
     photos: [] // Array of { url, caption }
   });
 
-  const [newPhoto, setNewPhoto] = useState({ url: '', caption: '' });
+  const [newPhoto, setNewPhoto] = useState({ url: '', caption: '', uploading: false });
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setNewPhoto(prev => ({ ...prev, uploading: true }));
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    try {
+      const res = await fetch('http://localhost:8080/api/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser?.token}`
+        },
+        body: uploadData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNewPhoto(prev => ({ ...prev, url: data.fullUrl, uploading: false }));
+      } else {
+        alert('Upload failed');
+        setNewPhoto(prev => ({ ...prev, uploading: false }));
+      }
+    } catch (err) {
+      console.error("Upload failed", err);
+      setNewPhoto(prev => ({ ...prev, uploading: false }));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -249,10 +278,33 @@ const Logs = () => {
                     </div>
                   )}
 
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input type="url" placeholder="Image URL (mock upload)" className="flex-1 rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={newPhoto.url} onChange={e => setNewPhoto({...newPhoto, url: e.target.value})} />
-                    <input type="text" placeholder="Caption (e.g. Ground leveling)" className="flex-1 rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={newPhoto.caption} onChange={e => setNewPhoto({...newPhoto, caption: e.target.value})} />
-                    <button type="button" onClick={addPhoto} disabled={!newPhoto.url} className="px-4 py-2 bg-slate-200  text-slate-800  rounded font-medium disabled:opacity-50 hover:bg-slate-300 :bg-slate-600 transition-colors">Add</button>
+                  <div className="flex flex-col sm:flex-row gap-2 items-center">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      disabled={newPhoto.uploading}
+                      className="flex-1 rounded border border-input bg-slate-50 px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" 
+                    />
+                    {newPhoto.uploading && <span className="text-xs text-slate-500">Uploading...</span>}
+                    {newPhoto.url && (
+                      <span className="text-xs text-green-600 truncate w-24">✓ Uploaded</span>
+                    )}
+                    <input 
+                      type="text" 
+                      placeholder="Caption (e.g. Ground leveling)" 
+                      className="flex-1 rounded border border-input bg-slate-50 px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" 
+                      value={newPhoto.caption} 
+                      onChange={e => setNewPhoto({...newPhoto, caption: e.target.value})} 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={addPhoto} 
+                      disabled={!newPhoto.url || newPhoto.uploading} 
+                      className="px-4 py-2 bg-slate-200 text-slate-800 rounded font-medium disabled:opacity-50 hover:bg-slate-300 transition-colors"
+                    >
+                      Add
+                    </button>
                   </div>
                 </div>
                 
