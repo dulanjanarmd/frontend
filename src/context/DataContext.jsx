@@ -91,6 +91,16 @@ export const DataProvider = ({ children }) => {
             documentUrl: '#'
           })));
         }
+
+        const iRes = await fetch('http://localhost:8080/api/issues', { headers });
+        if (iRes.ok) {
+          const rawI = await iRes.json();
+          setIssues(rawI.map(i => ({
+            ...i,
+            projectId: `p${i.project?.id}`,
+            reportedBy: `u${i.reportedBy?.id}`
+          })));
+        }
       } catch (err) {
         console.error('Error fetching data:', err);
       }
@@ -116,7 +126,6 @@ export const DataProvider = ({ children }) => {
       
       const newProject = await response.json();
       
-      // Update local state with the new project from backend
       setProjects([...projects, { 
         ...newProject, 
         progress: newProject.progressPercentage,
@@ -166,7 +175,7 @@ export const DataProvider = ({ children }) => {
         temperature: log.temperature ? parseFloat(log.temperature) : null,
         projectId: parseInt(projectId),
         photos: log.photos ? log.photos.map(p => ({
-          fileUrl: p.url,
+          fileUrl: p.url || p.fileUrl,
           caption: p.caption
         })) : []
       };
@@ -193,7 +202,6 @@ export const DataProvider = ({ children }) => {
           photos: log.photos || []
         }]);
       } else {
-        // Fallback to local state if backend fails
         setLogs(prev => [...prev, { ...log, id: `l${Date.now()}`, photos: log.photos || [] }]);
       }
     } catch (err) {
@@ -271,15 +279,44 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const addIssue = async (issue) => {
+    try {
+      const projectId = String(issue.projectId).replace('p', '');
+      const body = {
+        description: issue.description,
+        status: issue.status || 'OPEN'
+      };
+      const res = await fetch(`http://localhost:8080/api/issues?projectId=${projectId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const newIssue = await res.json();
+        setIssues([...issues, {
+          ...newIssue,
+          projectId: `p${newIssue.project?.id}`,
+          reportedBy: `u${newIssue.reportedBy?.id}`
+        }]);
+      } else {
+        setIssues([...issues, { ...issue, id: `i${Date.now()}` }]);
+      }
+    } catch (err) {
+      console.error('Failed to report issue:', err);
+      setIssues([...issues, { ...issue, id: `i${Date.now()}` }]);
+    }
+  };
+  
+  const updateIssue = (id, updates) => setIssues(issues.map(i => i.id === id ? { ...i, ...updates } : i));
 
   const updateApproval = (id, updates) => setApprovals(approvals.map(a => a.id === id ? { ...a, ...updates } : a));
   const addApprovalRequest = (request) => setApprovals([...approvals, { ...request, id: `a${Date.now()}` }]);
 
   const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);
   const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
-
-  const addIssue = (issue) => setIssues([...issues, { ...issue, id: `i${Date.now()}` }]);
-  const updateIssue = (id, updates) => setIssues(issues.map(i => i.id === id ? { ...i, ...updates } : i));
 
   const value = {
     projects, addProject, updateProject, deleteProject,

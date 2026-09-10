@@ -319,7 +319,7 @@ const Logs = () => {
                     <label className="block text-sm font-bold text-slate-700 mb-1">Related Task (Optional)</label>
                     <select className="w-full rounded border border-input bg-slate-50 px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.taskId} onChange={e => setFormData({...formData, taskId: e.target.value})}>
                       <option value="">General Site Progress</option>
-                      {tasks.filter(t => t.projectId === formData.projectId).map(t => (
+                      {tasks.filter(t => String(t.projectId).replace('p', '') === String(formData.projectId)).map(t => (
                         <option key={t.id} value={t.id}>{t.title}</option>
                       ))}
                     </select>
