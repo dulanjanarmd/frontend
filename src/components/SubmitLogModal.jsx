@@ -19,7 +19,36 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
     photos: []
   });
 
-  const [newPhoto, setNewPhoto] = useState({ url: '', caption: '' });
+  const [newPhoto, setNewPhoto] = useState({ url: '', caption: '', uploading: false });
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setNewPhoto(prev => ({ ...prev, uploading: true }));
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    try {
+      const res = await fetch('http://localhost:8080/api/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser?.token}`
+        },
+        body: uploadData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNewPhoto(prev => ({ ...prev, url: data.fullUrl, uploading: false }));
+      } else {
+        alert('Upload failed');
+        setNewPhoto(prev => ({ ...prev, uploading: false }));
+      }
+    } catch (err) {
+      console.error("Upload failed", err);
+      setNewPhoto(prev => ({ ...prev, uploading: false }));
+    }
+  };
 
   const handleAddPhoto = () => {
     if (newPhoto.url.trim()) {
@@ -206,15 +235,18 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 items-center">
                 <input
-                  type="url"
-                  placeholder="Image URL here..."
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
                   className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                  value={newPhoto.url}
-                  onChange={e => setNewPhoto({ ...newPhoto, url: e.target.value })}
-                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddPhoto(); } }}
+                  disabled={newPhoto.uploading}
                 />
+                {newPhoto.uploading && <span className="text-xs text-slate-500">Uploading...</span>}
+                {newPhoto.url && (
+                  <span className="text-xs text-green-600 truncate w-24">✓ Uploaded</span>
+                )}
                 <input
                   type="text"
                   placeholder="Caption (e.g. Ground leveling)"
