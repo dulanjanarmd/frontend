@@ -159,9 +159,24 @@ export const DataProvider = ({ children }) => {
         workDone: log.workDone,
         percentageCompleted: log.percentageCompleted,
         issues: log.issues || null,
-        projectId: parseInt(projectId)
+        equipmentUsed: log.equipmentUsed || null,
+        materialsDelivered: log.materialsDelivered || null,
+        safetyIncidents: log.safetyIncidents || null,
+        delayHours: log.delayHours ? parseInt(log.delayHours) : null,
+        temperature: log.temperature ? parseFloat(log.temperature) : null,
+        projectId: parseInt(projectId),
+        photos: log.photos ? log.photos.map(p => ({
+          fileUrl: p.url,
+          caption: p.caption
+        })) : []
       };
-      const res = await fetch(`http://localhost:8080/api/progress?projectId=${projectId}`, {
+      
+      let url = `http://localhost:8080/api/progress?projectId=${projectId}`;
+      if (log.taskId) {
+        url += `&taskId=${String(log.taskId).replace('t', '')}`;
+      }
+
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,
