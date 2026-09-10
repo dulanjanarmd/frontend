@@ -16,12 +16,13 @@ const SummaryCard = ({ icon: Icon, label, value, colorClass }) => (
 );
 
 const ProjectOverviewTab = ({ project }) => {
-  const { updateProject, tasks, approvals, logs } = useData();
+  const { updateProject, tasks, approvals, logs, users } = useData();
 
   const [modalType, setModalType] = useState(null);
   const [formData, setFormData] = useState({
     name: project.name,
     client: project.client,
+    clientId: project.clientId || '',
     location: project.location,
     startDate: project.startDate,
     endDate: project.endDate,
@@ -33,7 +34,7 @@ const ProjectOverviewTab = ({ project }) => {
     setModalType(type);
     if (type === 'edit') {
       setFormData({
-        name: project.name, client: project.client, location: project.location,
+        name: project.name, client: project.client, clientId: project.clientId || '', location: project.location,
         startDate: project.startDate, endDate: project.endDate, description: project.description
       });
     } else if (type === 'status') {
@@ -249,7 +250,20 @@ const ProjectOverviewTab = ({ project }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Client</label>
-                    <input required type="text" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} />
+                    <select
+                      required
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      value={formData.clientId || ''}
+                      onChange={e => {
+                        const selected = users.find(u => String(u.id) === e.target.value);
+                        setFormData({ ...formData, clientId: e.target.value, client: selected?.name || '' });
+                      }}
+                    >
+                      <option value="" disabled>Select a client</option>
+                      {users.filter(u => u.role === 'client').map(u => (
+                        <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Location</label>
