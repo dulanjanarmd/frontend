@@ -42,7 +42,7 @@ export const DataProvider = ({ children }) => {
           })));
         }
 
-        const uRes = await fetch('http://localhost:8080/api/users', { headers });
+        const uRes = await fetch('http://localhost:8080/api/admin/users', { headers });
         if (uRes.ok) {
           const rawU = await uRes.json();
           setUsers(rawU.map(u => ({
@@ -152,6 +152,106 @@ export const DataProvider = ({ children }) => {
       });
       if (!res.ok) throw new Error('Failed to delete project');
       setProjects(projects.filter(p => p.id !== id));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const addUser = async (userData) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create user');
+      }
+      
+      const newUser = await response.json();
+      
+      setUsers([...users, { 
+        ...newUser, 
+        id: `u${newUser.id}`,
+        role: newUser.role.toLowerCase()
+      }]);
+      
+      return newUser;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const deleteUser = async (id) => {
+    try {
+      const userId = String(id).replace('u', '');
+      const res = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to delete user');
+      setUsers(users.filter(u => u.id !== id));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const updateUser = async (id, userData) => {
+    try {
+      const userId = String(id).replace('u', '');
+      const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update user');
+      }
+      
+      const updatedUser = await response.json();
+      setUsers(users.map(u => u.id === id ? { 
+        ...updatedUser, 
+        id: `u${updatedUser.id}`,
+        role: updatedUser.role.toLowerCase()
+      } : u));
+      
+      return updatedUser;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const resetUserPassword = async (id, newPassword) => {
+    try {
+      const userId = String(id).replace('u', '');
+      const response = await fetch(`http://localhost:8080/api/admin/users/${userId}/password`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ newPassword })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to reset password');
+      }
+      
+      return await response.json();
     } catch (err) {
       console.error(err);
       throw err;
@@ -530,7 +630,7 @@ export const DataProvider = ({ children }) => {
     logs, addLog, updateLog, deleteLog,
     approvals, updateApproval, addApprovalRequest,
     consultations, addConsultation, updateConsultation,
-    users,
+    users, addUser, deleteUser, updateUser, resetUserPassword,
     issues, addIssue, updateIssue, deleteIssue, getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus,
     getGlobalMessages, sendGlobalMessage
   };
