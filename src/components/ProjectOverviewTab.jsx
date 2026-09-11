@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +19,9 @@ const SummaryCard = ({ icon: Icon, label, value, colorClass }) => (
 
 const ProjectOverviewTab = ({ project }) => {
   const { updateProject, deleteProject, tasks, approvals, logs, users } = useData();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const isClient = currentUser?.role === 'client';
 
   const [modalType, setModalType] = useState(null);
   const [formData, setFormData] = useState({
@@ -142,22 +145,24 @@ const ProjectOverviewTab = ({ project }) => {
           <div className="glass-card p-6">
             <div className="flex justify-between items-center border-b border-border pb-4 mb-4">
               <h2 className="text-xl font-bold">Project Details</h2>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => openModal('edit')}
-                  className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 :bg-indigo-900/30 rounded-md transition-colors"
-                  title="Edit Details"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={handleDeleteProject}
-                  className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 :bg-red-900/30 rounded-md transition-colors"
-                  title="Delete Project"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+              {!isClient && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openModal('edit')}
+                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                    title="Edit Details"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleDeleteProject}
+                    className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                    title="Delete Project"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
             <div className="space-y-4">
               <div>
@@ -195,15 +200,17 @@ const ProjectOverviewTab = ({ project }) => {
           <div className="glass-card p-6">
             <div className="flex justify-between items-center border-b border-border pb-4 mb-4">
               <h2 className="text-xl font-bold flex items-center">
-                <Activity className="w-5 h-5 mr-2 text-blue-500" /> Status & Progress
+                <Activity className="w-5 h-5 mr-2 text-blue-500" /> Status &amp; Progress
               </h2>
-              <button
-                onClick={() => openModal('status')}
-                className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 :bg-blue-900/30 rounded-md transition-colors"
-                title="Update Status"
-              >
-                <Edit2 className="w-4 h-4" />
-              </button>
+              {!isClient && (
+                <button
+                  onClick={() => openModal('status')}
+                  className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                  title="Update Status"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
             <div className="space-y-4">
               <div>
