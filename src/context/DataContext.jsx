@@ -283,10 +283,22 @@ export const DataProvider = ({ children }) => {
     try {
       const projectId = String(issue.projectId).replace('p', '');
       const body = {
+        title: issue.title,
         description: issue.description,
-        status: issue.status || 'OPEN'
+        severity: issue.severity || 'Medium',
+        status: issue.status || 'OPEN',
+        location: issue.location || null,
+        equipmentInvolved: issue.equipmentInvolved || null,
+        estimatedDelayDays: issue.estimatedDelayDays ? parseInt(issue.estimatedDelayDays) : null,
+        photoUrl: issue.photoUrl || null
       };
-      const res = await fetch(`http://localhost:8080/api/issues?projectId=${projectId}`, {
+      
+      let url = `http://localhost:8080/api/issues?projectId=${projectId}`;
+      if (issue.taskId) {
+        url += `&taskId=${String(issue.taskId).replace('t', '')}`;
+      }
+
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,
@@ -312,6 +324,79 @@ export const DataProvider = ({ children }) => {
   
   const updateIssue = (id, updates) => setIssues(issues.map(i => i.id === id ? { ...i, ...updates } : i));
 
+  const getIssueComments = async (issueId) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/issues/${issueId}/comments`, {
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      return res.ok ? await res.json() : [];
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
+
+  const addIssueComment = async (issueId, comment) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/issues/${issueId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(comment)
+      });
+      return res.ok ? await res.json() : null;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
+  const getIssueMeetings = async (issueId) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/issues/${issueId}/meetings`, {
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      return res.ok ? await res.json() : [];
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
+
+  const addIssueMeeting = async (issueId, meeting) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/issues/${issueId}/meetings`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(meeting)
+      });
+      return res.ok ? await res.json() : null;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
+  const updateIssueStatus = async (issueId, status, assigneeId = null) => {
+    try {
+      let url = `http://localhost:8080/api/issues/${issueId}/status?status=${status}`;
+      if (assigneeId) url += `&assigneeId=${assigneeId}`;
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        updateIssue(issueId, { status: updated.status, assignee: updated.assignee });
+      }
+    } catch (err) { console.error(err); }
+  };
+
   const updateApproval = (id, updates) => setApprovals(approvals.map(a => a.id === id ? { ...a, ...updates } : a));
   const addApprovalRequest = (request) => setApprovals([...approvals, { ...request, id: `a${Date.now()}` }]);
 
@@ -325,7 +410,7 @@ export const DataProvider = ({ children }) => {
     approvals, updateApproval, addApprovalRequest,
     consultations, addConsultation, updateConsultation,
     users,
-    issues, addIssue, updateIssue
+    issues, addIssue, updateIssue, getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

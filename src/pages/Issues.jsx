@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare } from 'lucide-react';
+import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SEVERITY_STYLES = {
@@ -11,50 +11,338 @@ const SEVERITY_STYLES = {
 };
 
 const STATUS_STYLES = {
-  Open: 'bg-red-50 text-red-600',
-  'In Progress': 'bg-amber-50 text-amber-600',
-  Resolved: 'bg-green-50 text-green-600'
+  OPEN: 'bg-red-50 text-red-600',
+  INFO_REQUESTED_SE: 'bg-orange-50 text-orange-600',
+  INFO_REQUESTED_PM: 'bg-orange-50 text-orange-600',
+  PENDING_PM: 'bg-amber-50 text-amber-600',
+  PENDING_CEO: 'bg-purple-50 text-purple-600',
+  CLIENT_REVIEW: 'bg-blue-50 text-blue-600',
+  RESOLVED: 'bg-green-50 text-green-600'
+};
+
+const DetailedIssue = ({ issue, projects, tasks, users }) => {
+  const { currentUser } = useAuth();
+  const { getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus } = useData();
+  
+  const [comments, setComments] = useState([]);
+  const [meetings, setMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [newComment, setNewComment] = useState('');
+  const [commentType, setCommentType] = useState('GENERAL');
+  
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+  const [meetingData, setMeetingData] = useState({ title: '', scheduledTime: '', meetingLink: '' });
+
+  const [uploading, setUploading] = useState(false);
+  const [commentPhoto, setCommentPhoto] = useState('');
+
+  const project = projects.find(p => String(p.id) === String(issue.projectId));
+  const task = tasks.find(t => String(t.id) === String(issue.taskId));
+  
+  const assigneeStr = String(issue.assignee || issue.assigneeId || '');
+  const assignedUser = users.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
+  
+  const reporterStr = String(issue.reportedBy || issue.reportedById || '');
+  const reporterUser = users.find(u => String(u.id) === reporterStr) || { name: 'Unknown', role: '' };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const c = await getIssueComments(String(issue.id).replace('i', ''));
+      const m = await getIssueMeetings(String(issue.id).replace('i', ''));
+      setComments(c);
+      setMeetings(m);
+      setLoading(false);
+    };
+    fetchData();
+  }, [issue.id]);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    const data = new FormData();
+    data.append('file', file);
+    try {
+      const res = await fetch('http://localhost:8080/api/files/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${currentUser?.token}` },
+        body: data
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setCommentPhoto(json.fullUrl);
+      }
+    } catch (err) { console.error(err); }
+    setUploading(false);
+  };
+
+  const submitComment = async () => {
+    if (!newComment.trim()) return;
+    const body = { message: newComment, commentType, photoUrl: commentPhoto };
+    const saved = await addIssueComment(String(issue.id).replace('i', ''), body);
+    if (saved) {
+      setComments([...comments, { ...saved, sender: currentUser }]);
+      setNewComment('');
+      setCommentPhoto('');
+    }
+    
+    // Auto status update logic based on comment type and role
+    if (commentType === 'INFO_REQUEST') {
+      if (currentUser.role === 'PROJECT_MANAGER') updateIssueStatus(String(issue.id).replace('i', ''), 'INFO_REQUESTED_SE', reporterUser.id);
+      else if (currentUser.role === 'CEO') updateIssueStatus(String(issue.id).replace('i', ''), 'INFO_REQUESTED_PM', null);
+    } else if (commentType === 'SOLUTION') {
+      updateIssueStatus(String(issue.id).replace('i', ''), 'RESOLVED', null);
+    }
+  };
+
+  const submitMeeting = async (e) => {
+    e.preventDefault();
+    const saved = await addIssueMeeting(String(issue.id).replace('i', ''), meetingData);
+    if (saved) {
+      setMeetings([...meetings, { ...saved, organizer: currentUser }]);
+      setIsMeetingModalOpen(false);
+    }
+  };
+
+  const handleEscalateToCEO = () => {
+    updateIssueStatus(String(issue.id).replace('i', ''), 'PENDING_CEO', null); // Ideally find CEO id
+  };
+
+  return (
+    <div className="border-t border-border bg-slate-50/50 px-5 py-6">
+      {/* Details Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-sm">
+        {issue.location && (
+          <div className="flex items-start gap-2">
+            <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
+            <div>
+              <p className="font-semibold text-slate-700">Location</p>
+              <p className="text-slate-600">{issue.location}</p>
+            </div>
+          </div>
+        )}
+        {issue.equipmentInvolved && (
+          <div className="flex items-start gap-2">
+            <Wrench className="w-4 h-4 text-slate-400 mt-0.5" />
+            <div>
+              <p className="font-semibold text-slate-700">Equipment</p>
+              <p className="text-slate-600">{issue.equipmentInvolved}</p>
+            </div>
+          </div>
+        )}
+        {issue.estimatedDelayDays && (
+          <div className="flex items-start gap-2">
+            <Clock className="w-4 h-4 text-slate-400 mt-0.5" />
+            <div>
+              <p className="font-semibold text-slate-700">Estimated Delay</p>
+              <p className="text-slate-600">{issue.estimatedDelayDays} days</p>
+            </div>
+          </div>
+        )}
+        <div className="flex items-start gap-2">
+          <UserIcon className="w-4 h-4 text-slate-400 mt-0.5" />
+          <div>
+            <p className="font-semibold text-slate-700">Assignee</p>
+            <p className="text-slate-600">{assignedUser.name}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-6 mb-8 flex-col lg:flex-row">
+        {issue.photoUrl && (
+          <div className="w-full lg:w-1/3 rounded-lg overflow-hidden shrink-0 border border-border">
+            <img src={issue.photoUrl} alt="Issue Evidence" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <div className="flex-1">
+          <h4 className="font-bold text-slate-800 mb-2">Description</h4>
+          <p className="text-slate-600 whitespace-pre-wrap">{issue.description}</p>
+        </div>
+      </div>
+
+      {/* Timeline */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <MessageSquare className="w-5 h-5 text-indigo-500" /> Resolution Timeline
+        </h4>
+        
+        {loading ? (
+          <p className="text-slate-400 text-sm">Loading timeline...</p>
+        ) : (
+          <div className="space-y-4 mb-6 max-h-96 overflow-y-auto pr-2">
+            {[...comments, ...meetings].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map(item => {
+              const isMeeting = !!item.meetingLink;
+              
+              if (isMeeting) {
+                return (
+                  <div key={`m${item.id}`} className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3">
+                    <Video className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-blue-900">{item.title}</p>
+                      <p className="text-xs text-blue-700 mb-2">Organized by {item.organizer?.name || 'Unknown'} for {new Date(item.scheduledTime).toLocaleString()}</p>
+                      <a href={item.meetingLink} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline font-medium">Join Meeting →</a>
+                    </div>
+                  </div>
+                );
+              }
+
+              const isInfoReq = item.commentType === 'INFO_REQUEST';
+              const isSolution = item.commentType === 'SOLUTION';
+              
+              return (
+                <div key={`c${item.id}`} className={`p-3 rounded-lg border ${isSolution ? 'bg-green-50 border-green-200' : isInfoReq ? 'bg-orange-50 border-orange-200' : 'bg-slate-50 border-slate-100'}`}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-semibold text-sm text-slate-800">{item.sender?.name || 'User'} <span className="text-xs text-slate-500 font-normal">({item.sender?.role || ''})</span></span>
+                    <span className="text-xs text-slate-400">{new Date(item.createdAt).toLocaleString()}</span>
+                  </div>
+                  {isSolution && <span className="text-xs font-bold text-green-700 uppercase mb-1 block">Solution Provided</span>}
+                  {isInfoReq && <span className="text-xs font-bold text-orange-700 uppercase mb-1 block">Information Requested</span>}
+                  <p className="text-sm text-slate-700">{item.message}</p>
+                  {item.photoUrl && <img src={item.photoUrl} alt="Attached" className="mt-2 rounded max-w-xs max-h-40 border border-slate-200" />}
+                </div>
+              );
+            })}
+            {comments.length === 0 && meetings.length === 0 && <p className="text-sm text-slate-400 italic">No updates yet.</p>}
+          </div>
+        )}
+
+        {/* Comment Box */}
+        {issue.status !== 'RESOLVED' && (
+          <div className="border-t border-slate-100 pt-4">
+            <div className="flex gap-2 mb-2">
+              <select className="text-sm border border-slate-200 rounded px-2 py-1 outline-none bg-slate-50" value={commentType} onChange={e => setCommentType(e.target.value)}>
+                <option value="GENERAL">General Comment</option>
+                {(currentUser.role === 'PROJECT_MANAGER' || currentUser.role === 'CEO') && <option value="INFO_REQUEST">Request Info</option>}
+                <option value="SOLUTION">Provide Solution</option>
+              </select>
+              <button onClick={() => setIsMeetingModalOpen(true)} className="text-sm border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded px-3 py-1 flex items-center transition-colors">
+                <Calendar className="w-3 h-3 mr-1" /> Schedule Meeting
+              </button>
+              {(currentUser.role === 'PROJECT_MANAGER') && (
+                <button onClick={handleEscalateToCEO} className="text-sm border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded px-3 py-1 transition-colors ml-auto">
+                  Escalate to CEO
+                </button>
+              )}
+            </div>
+            
+            <textarea
+              rows="2"
+              className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+              placeholder="Type your message..."
+              value={newComment}
+              onChange={e => setNewComment(e.target.value)}
+            />
+            
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex items-center gap-2">
+                <input type="file" id={`upload-${issue.id}`} className="hidden" onChange={handleFileUpload} />
+                <label htmlFor={`upload-${issue.id}`} className="cursor-pointer text-slate-500 hover:text-slate-700 flex items-center text-sm font-medium transition-colors">
+                  <UploadCloud className="w-4 h-4 mr-1" />
+                  {uploading ? 'Uploading...' : commentPhoto ? 'File Attached' : 'Attach File'}
+                </label>
+              </div>
+              <button onClick={submitComment} disabled={uploading || !newComment.trim()} className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                Send
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Meeting Modal */}
+      <AnimatePresence>
+        {isMeetingModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+              <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-slate-50">
+                <h2 className="text-xl font-bold text-slate-800">Schedule Meeting</h2>
+                <button onClick={() => setIsMeetingModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+              </div>
+              <form onSubmit={submitMeeting} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Meeting Title</label>
+                  <input required type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.title} onChange={e => setMeetingData({...meetingData, title: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Date & Time</label>
+                  <input required type="datetime-local" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.scheduledTime} onChange={e => setMeetingData({...meetingData, scheduledTime: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Meeting Link (Zoom/Meet)</label>
+                  <input required type="url" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.meetingLink} onChange={e => setMeetingData({...meetingData, meetingLink: e.target.value})} />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setIsMeetingModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-md">Cancel</button>
+                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-md">Schedule</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
 };
 
 const Issues = () => {
-  const { issues, addIssue, projects } = useData();
+  const { issues, addIssue, projects, tasks, users } = useData();
   const { currentUser } = useAuth();
   
   const [isAdding, setIsAdding] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     projectId: '',
+    taskId: '',
     title: '',
     description: '',
     severity: 'Medium',
+    location: '',
+    equipmentInvolved: '',
+    estimatedDelayDays: '',
     photoUrl: ''
   });
 
   const [expandedId, setExpandedId] = useState(null);
 
-  // Get projects the engineer is assigned to (simplified for demo)
-  const myProjects = projects; // In a real app, filter by assignment
+  const myProjects = projects;
+  const myIssues = (issues || []).sort((a, b) => new Date(b.reportedDate || b.createdAt) - new Date(a.reportedDate || a.createdAt));
 
-  // Get issues reported by this engineer (or just show all for demo if no reporter ID is saved yet, 
-  // but let's assume they want to see all issues for their projects)
-  const myIssues = (issues || []).sort((a, b) => new Date(b.reportedDate) - new Date(a.reportedDate));
+  const openCount = myIssues.filter(i => i.status !== 'RESOLVED').length;
 
-  const openCount = myIssues.filter(i => i.status === 'Open').length;
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const data = new FormData();
+    data.append('file', file);
+
+    try {
+      const res = await fetch('http://localhost:8080/api/files/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${currentUser?.token}` },
+        body: data
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setFormData(prev => ({ ...prev, photoUrl: json.fullUrl }));
+      } else {
+        alert('Upload failed');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setIsUploading(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newIssue = {
-      projectId: formData.projectId,
-      title: formData.title,
-      description: formData.description,
-      severity: formData.severity,
-      status: 'Open',
-      reportedDate: new Date().toISOString().split('T')[0],
-      resolution: '',
-      photoUrl: formData.photoUrl
-    };
-    
+    const newIssue = { ...formData, status: 'OPEN' };
     addIssue(newIssue);
-    setFormData({ projectId: '', title: '', description: '', severity: 'Medium', photoUrl: '' });
+    setFormData({ projectId: '', taskId: '', title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', photoUrl: '' });
     setIsAdding(false);
   };
 
@@ -63,10 +351,10 @@ const Issues = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
             Site Issues
           </h1>
-          <p className="text-slate-500 mt-1">{openCount} open issues require attention.</p>
+          <p className="text-slate-500 mt-1">{openCount} active issues require attention.</p>
         </div>
         <button
           onClick={() => setIsAdding(true)}
@@ -93,72 +381,73 @@ const Issues = () => {
             </h3>
             
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Project <span className="text-red-500">*</span></label>
-                  <select
-                    required
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none"
-                    value={formData.projectId}
-                    onChange={e => setFormData({ ...formData, projectId: e.target.value })}
-                  >
+                  <select required className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.projectId} onChange={e => setFormData({ ...formData, projectId: e.target.value, taskId: '' })}>
                     <option value="" disabled>Select Project</option>
-                    {myProjects.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
+                    {myProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Related Task</label>
+                  <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.taskId} onChange={e => setFormData({ ...formData, taskId: e.target.value })}>
+                    <option value="">General Site Issue</option>
+                    {tasks.filter(t => String(t.projectId).replace('p', '') === String(formData.projectId)).map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Severity <span className="text-red-500">*</span></label>
-                  <select
-                    required
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none"
-                    value={formData.severity}
-                    onChange={e => setFormData({ ...formData, severity: e.target.value })}
-                  >
+                  <select required className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.severity} onChange={e => setFormData({ ...formData, severity: e.target.value })}>
                     <option value="High">High (Immediate action required)</option>
                     <option value="Medium">Medium</option>
                     <option value="Low">Low (Observation)</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Est. Delay (Days)</label>
+                  <input type="number" min="0" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.estimatedDelayDays} onChange={e => setFormData({ ...formData, estimatedDelayDays: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Location / Area</label>
+                  <input type="text" placeholder="e.g. 3rd Floor North Wing" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Equipment Involved</label>
+                  <input type="text" placeholder="e.g. Tower Crane 2" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.equipmentInvolved} onChange={e => setFormData({ ...formData, equipmentInvolved: e.target.value })} />
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-1">Issue Title <span className="text-red-500">*</span></label>
-                <input
-                  required type="text"
-                  placeholder="e.g. Material delivery delayed"
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none"
-                  value={formData.title}
-                  onChange={e => setFormData({ ...formData, title: e.target.value })}
-                />
+                <input required type="text" placeholder="e.g. Material delivery delayed" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-1">Description <span className="text-red-500">*</span></label>
-                <textarea
-                  required rows="3"
-                  placeholder="Describe the issue in detail..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none"
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                />
+                <textarea required rows="3" placeholder="Describe the issue in detail..." className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Supporting Photo (Optional)</label>
-                <input
-                  type="url"
-                  placeholder="Paste image URL here..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none"
-                  value={formData.photoUrl}
-                  onChange={e => setFormData({ ...formData, photoUrl: e.target.value })}
-                />
+                <label className="block text-sm font-medium mb-1 flex items-center">
+                  Supporting Photo / Document
+                </label>
+                <div className="flex items-center gap-4">
+                  <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border border-slate-300 text-sm font-medium transition-colors flex items-center">
+                    <UploadCloud className="w-4 h-4 mr-2" />
+                    {isUploading ? 'Uploading...' : 'Choose File'}
+                    <input type="file" className="hidden" onChange={handleFileUpload} disabled={isUploading} />
+                  </label>
+                  {formData.photoUrl && <span className="text-sm text-green-600 font-medium flex items-center">✓ File Attached</span>}
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsAdding(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors shadow-lg shadow-red-500/20">Submit Issue</button>
+                <button type="button" onClick={() => setIsAdding(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-md transition-colors">Cancel</button>
+                <button type="submit" disabled={isUploading} className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-md transition-colors shadow-lg shadow-red-500/20">Submit Issue</button>
               </div>
             </div>
           </motion.form>
@@ -175,6 +464,11 @@ const Issues = () => {
         <div className="space-y-3">
           {myIssues.map((issue, idx) => {
             const project = projects.find(p => String(p.id) === String(issue.projectId));
+            const task = tasks.find(t => String(t.id) === String(issue.taskId));
+            
+            const assigneeStr = String(issue.assignee || issue.assigneeId || '');
+            const assignedUser = users.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
+
             return (
               <motion.div
                 key={issue.id}
@@ -190,24 +484,32 @@ const Issues = () => {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${SEVERITY_STYLES[issue.severity]}`}>
-                          {issue.severity}
+                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${SEVERITY_STYLES[issue.severity] || SEVERITY_STYLES.Medium}`}>
+                          {issue.severity || 'Medium'}
                         </span>
-                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${STATUS_STYLES[issue.status]}`}>
-                          {issue.status}
+                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${STATUS_STYLES[issue.status] || STATUS_STYLES.OPEN}`}>
+                          {issue.status?.replace(/_/g, ' ') || 'OPEN'}
                         </span>
-                        <span className="text-xs font-medium text-slate-500">{project?.name || 'Project'}</span>
-                        <span className="text-xs text-slate-400">{issue.reportedDate}</span>
+                        <span className="text-xs font-medium text-slate-500">
+                          {project?.name || 'Project'} {task ? `› ${task.title}` : ''}
+                        </span>
+                        <span className="text-xs text-slate-400">{issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : ''}</span>
                       </div>
                       <h3 className="font-bold text-slate-900 ">{issue.title}</h3>
-                      <p className="text-sm text-slate-600  mt-1">{issue.description}</p>
+                      <p className="text-sm text-slate-600 mt-1 line-clamp-1">{issue.description}</p>
                     </div>
-                    <button
-                      onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
-                      className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors shrink-0"
-                    >
-                      {expandedId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <div className="text-right hidden sm:block">
+                        <p className="text-xs text-slate-400">Assignee</p>
+                        <p className="text-sm font-medium text-slate-700">{assignedUser.name}</p>
+                      </div>
+                      <button
+                        onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
+                        className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"
+                      >
+                        {expandedId === issue.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -217,27 +519,9 @@ const Issues = () => {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-border bg-slate-50/50  px-5 py-4 flex gap-4"
+                      className="overflow-hidden"
                     >
-                      {issue.photoUrl && (
-                        <div className="w-32 h-32 rounded-lg overflow-hidden shrink-0 border border-border">
-                          <img src={issue.photoUrl} alt="Issue" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        {issue.resolution ? (
-                          <div className="bg-green-50  border border-green-200  rounded-md p-3">
-                            <p className="text-xs font-semibold text-green-700  mb-1 flex items-center">
-                              <MessageSquare className="w-3 h-3 mr-1" /> PM Resolution Note
-                            </p>
-                            <p className="text-sm text-green-700 ">{issue.resolution}</p>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-slate-500 italic flex items-center gap-2">
-                            <MessageSquare className="w-4 h-4" /> Waiting for PM review...
-                          </p>
-                        )}
-                      </div>
+                      <DetailedIssue issue={issue} projects={projects} tasks={tasks} users={users} />
                     </motion.div>
                   )}
                 </AnimatePresence>
