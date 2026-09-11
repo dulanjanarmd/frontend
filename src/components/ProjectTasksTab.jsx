@@ -37,6 +37,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
   const isSiteEngineer = currentUser?.role === 'site_engineer';
+  const isClient = currentUser?.role === 'client';
 
   const siteEngineers = users.filter(u => u.role === 'site_engineer');
   const milestones = project?.milestones || [];

@@ -11,6 +11,7 @@ const Projects = () => {
   const navigate = useNavigate();
   
   const isSiteEngineer = currentUser?.role === 'site_engineer';
+  const isClient = currentUser?.role === 'client';
 
   // Modals state
   const [modalType, setModalType] = useState(null); // 'create', 'edit', 'milestones', 'status'
@@ -122,7 +123,7 @@ const Projects = () => {
         <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
           {isSiteEngineer ? 'My Projects' : 'Projects Management'}
         </h1>
-        {!isSiteEngineer && (
+        {!isSiteEngineer && !isClient && (
           <button 
             onClick={() => navigate('/portal/projects/new')}
             className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
@@ -182,18 +183,18 @@ const Projects = () => {
                         View <ArrowRight className="w-4 h-4 ml-1" />
                       </button>
                       
-                      {!isSiteEngineer && (
+                      {!isSiteEngineer && !isClient && (
                         <>
-                          <button onClick={() => openModal('status', project)} className="p-2 text-slate-500 hover:text-primary hover:bg-blue-50 :bg-blue-900/30 rounded-md transition-colors" title="Update Status">
+                          <button onClick={() => openModal('status', project)} className="p-2 text-slate-500 hover:text-primary hover:bg-blue-50 rounded-md transition-colors" title="Update Status">
                             <Activity className="w-4 h-4" />
                           </button>
-                          <button onClick={() => openModal('milestones', project)} className="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 :bg-amber-900/30 rounded-md transition-colors" title="Manage Milestones">
+                          <button onClick={() => openModal('milestones', project)} className="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors" title="Manage Milestones">
                             <Flag className="w-4 h-4" />
                           </button>
-                          <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 :bg-indigo-900/30 rounded-md transition-colors" title="Edit Project">
+                          <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors" title="Edit Project">
                             <Edit2 className="w-4 h-4" />
                           </button>
-                          <button onClick={() => handleDeleteProject(project)} className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 :bg-red-900/30 rounded-md transition-colors" title="Delete Project">
+                          <button onClick={() => handleDeleteProject(project)} className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Delete Project">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </>

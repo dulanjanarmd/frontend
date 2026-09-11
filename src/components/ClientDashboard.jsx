@@ -13,9 +13,16 @@ const ClientDashboard = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestText, setRequestText] = useState('');
   const [requestSent, setRequestSent] = useState(false);
+
+  const STATUS_STYLE = {
+    Completed:   'bg-green-100 text-green-700',
+    'In Progress':'bg-blue-100 text-blue-700',
+    Planning:    'bg-purple-100 text-purple-700',
+    'On Hold':   'bg-amber-100 text-amber-700',
+    Delayed:     'bg-red-100 text-red-700'
+  };
 
   // Filter to only show THIS client's projects
   const myProjects = projects.filter(p => {
@@ -92,51 +99,43 @@ const ClientDashboard = () => {
     setRequestText('');
     setTimeout(() => {
       setRequestSent(false);
-      setIsRequestModalOpen(false);
     }, 2000);
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <header className="mb-6 flex justify-between items-start">
+    <div className="space-y-4 animate-in fade-in duration-500">
+      <header className="mb-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
             Welcome, {currentUser?.name || 'Client'}
           </h1>
-          <p className="text-slate-500 mt-2">Here is the latest overview of your investments.</p>
+          <p className="text-slate-500 mt-1">Here is the latest overview of your investments.</p>
         </div>
-        <button
-          onClick={() => setIsRequestModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm shadow-lg shadow-indigo-500/30 transition-colors"
-        >
-          <MessageSquare className="w-4 h-4" />
-          Message Project Manager
-        </button>
       </header>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-5 border border-border">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4 border border-border">
           <p className="text-sm font-medium text-slate-500 mb-1">Total Projects</p>
           <p className="text-3xl font-bold text-slate-900">{totalProjects}</p>
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-5 border border-border">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4 border border-border">
           <p className="text-sm font-medium text-slate-500 mb-1">In Progress</p>
           <p className="text-3xl font-bold text-blue-600">{inProgress}</p>
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-5 border border-border">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-4 border border-border">
           <p className="text-sm font-medium text-slate-500 mb-1">Completed</p>
           <p className="text-3xl font-bold text-green-600">{completed}</p>
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-5 border border-amber-200 bg-amber-50/50">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-4 border border-amber-200 bg-amber-50/50">
           <p className="text-sm font-medium text-amber-600 mb-1">Pending Approvals</p>
           <p className="text-3xl font-bold text-amber-600">{pendingCount}</p>
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Main Content (Projects) */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-slate-900 flex items-center">
               <Briefcase className="w-5 h-5 mr-2 text-primary" />
@@ -160,7 +159,7 @@ const ClientDashboard = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
-                  className="glass-card p-5 cursor-pointer hover:shadow-lg transition-all border border-border group"
+                  className="glass-card p-4 cursor-pointer hover:shadow-lg transition-all border border-border group"
                   onClick={() => navigate(`/portal/projects/${project.id}`)}
                 >
                   <div className="flex justify-between items-start mb-4">
@@ -168,7 +167,7 @@ const ClientDashboard = () => {
                       <h3 className="font-bold text-lg text-slate-900 group-hover:text-primary transition-colors">{project.name}</h3>
                       <p className="text-sm text-slate-500">{project.location || 'Location Not Specified'}</p>
                     </div>
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${STATUS_STYLE[project.status] || 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
                       {project.status}
                     </span>
                   </div>
@@ -199,9 +198,9 @@ const ClientDashboard = () => {
         </div>
 
         {/* Sidebar Content (Notifications & Approvals) */}
-        <div className="space-y-6">
-          <div className="glass-card p-5 border-t-4 border-t-amber-500">
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+        <div className="space-y-4">
+          <div className="glass-card p-4 border-t-4 border-t-amber-500">
+            <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center">
               <CheckSquare className="w-5 h-5 mr-2 text-amber-500" />
               Action Required
             </h2>
@@ -229,8 +228,8 @@ const ClientDashboard = () => {
             )}
           </div>
 
-          <div className="glass-card p-5">
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+          <div className="glass-card p-4">
+            <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center">
               <Bell className="w-5 h-5 mr-2 text-primary" />
               Recent Notifications
             </h2>

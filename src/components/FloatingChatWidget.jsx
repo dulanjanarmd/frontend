@@ -68,7 +68,7 @@ const FloatingChatWidget = () => {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/30 transition-transform ${isOpen ? 'scale-0' : 'scale-100 hover:scale-110'} z-50`}
+        className={`fixed bottom-6 right-6 w-14 h-14 bg-primary hover:opacity-90 text-primary-foreground rounded-full flex items-center justify-center shadow-lg shadow-primary/30 transition-transform ${isOpen ? 'scale-0' : 'scale-100 hover:scale-110'} z-50`}
       >
         <MessageCircle className="w-6 h-6" />
       </button>
@@ -79,26 +79,26 @@ const FloatingChatWidget = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 w-80 sm:w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-slate-200"
+            className="fixed bottom-6 right-6 w-80 sm:w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-border"
           >
             {/* Header */}
-            <div className="bg-indigo-600 text-white px-4 py-3 flex items-center justify-between shadow-md z-10">
+            <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between shadow-md z-10">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
                 <h3 className="font-bold">Project Chat</h3>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-indigo-500 rounded-md transition-colors"
+                className="p-1 hover:bg-primary/80 rounded-md transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Project Selector */}
-            <div className="bg-slate-50 border-b border-slate-200 px-3 py-2">
+            <div className="bg-slate-50 border-b border-border px-3 py-2">
               <select
-                className="w-full text-sm rounded-md border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white py-1.5"
+                className="w-full text-sm rounded-md border-input focus:border-primary focus:ring-1 focus:ring-primary bg-white py-1.5"
                 value={selectedProjectId}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
               >
@@ -130,7 +130,7 @@ const FloatingChatWidget = () => {
                         <span className="text-[10px] text-slate-400">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                       <div className={`px-3 py-2 rounded-2xl max-w-[85%] text-sm shadow-sm ${
-                        isMe ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-white text-slate-800 rounded-bl-sm border border-slate-100'
+                        isMe ? 'bg-primary text-primary-foreground rounded-br-sm' : 'bg-white text-slate-800 rounded-bl-sm border border-border'
                       }`}>
                         {msg.messageText}
                       </div>
@@ -141,20 +141,20 @@ const FloatingChatWidget = () => {
             </div>
 
             {/* Input Area */}
-            <div className="p-3 border-t border-slate-200 bg-white">
+            <div className="p-3 border-t border-border bg-white">
               <form onSubmit={handleSend} className="flex gap-2 relative">
                 <input
                   type="text"
-                  className="flex-1 rounded-full border border-slate-300 pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
+                  className="flex-1 rounded-full border border-input pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
                   placeholder="Type a message..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   disabled={!selectedProjectId}
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={!newMessage.trim() || !selectedProjectId}
-                  className="absolute right-1 top-1 bottom-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-full w-8 flex items-center justify-center transition-colors"
+                  className="absolute right-1 top-1 bottom-1 bg-primary hover:opacity-90 disabled:opacity-50 text-primary-foreground rounded-full w-8 flex items-center justify-center transition-colors"
                 >
                   <Send className="w-4 h-4 mr-0.5" />
                 </button>

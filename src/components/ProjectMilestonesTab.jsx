@@ -216,13 +216,19 @@ const ProjectMilestonesTab = ({ project }) => {
                   animate={{ opacity: 1 }}
                   className={`flex items-center gap-4 px-6 py-4 transition-colors ${isCompleted ? 'bg-green-50/30 ' : 'hover:bg-slate-50/50 :bg-slate-800/30'}`}
                 >
-                  {/* Toggle button */}
-                  <button
-                    onClick={() => handleToggle(m.id)}
-                    className={`shrink-0 transition-colors ${isCompleted ? 'text-green-500' : 'text-slate-300  hover:text-primary'}`}
-                  >
-                    {isCompleted ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
-                  </button>
+                  {/* Toggle button - only for non-clients */}
+                  {!isClient ? (
+                    <button
+                      onClick={() => handleToggle(m.id)}
+                      className={`shrink-0 transition-colors ${isCompleted ? 'text-green-500' : 'text-slate-300 hover:text-primary'}`}
+                    >
+                      {isCompleted ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                    </button>
+                  ) : (
+                    <div className="shrink-0">
+                      {isCompleted ? <CheckCircle2 className="w-6 h-6 text-green-500" /> : <Circle className="w-6 h-6 text-slate-300" />}
+                    </div>
+                  )}
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
@@ -261,28 +267,30 @@ const ProjectMilestonesTab = ({ project }) => {
                     )}
                   </div>
 
-                  {/* Action buttons */}
-                  <div className="flex items-center gap-1 shrink-0">
-                    {isEditing ? (
-                      <>
-                        <button onClick={() => handleEditSave(m.id)} className="p-1.5 text-green-500 hover:bg-green-50 :bg-green-900/20 rounded-md transition-colors">
-                          <Check className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => setEditingId(null)} className="p-1.5 text-slate-400 hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => startEdit(m)} className="p-1.5 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 :bg-indigo-900/20 rounded-md transition-colors">
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleDelete(m.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 :bg-red-900/20 rounded-md transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </>
-                    )}
-                  </div>
+                  {/* Action buttons - hidden from clients */}
+                  {!isClient && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      {isEditing ? (
+                        <>
+                          <button onClick={() => handleEditSave(m.id)} className="p-1.5 text-green-500 hover:bg-green-50 rounded-md transition-colors">
+                            <Check className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => setEditingId(null)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-md transition-colors">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => startEdit(m)} className="p-1.5 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-md transition-colors">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(m.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </motion.div>
               );
             })}
