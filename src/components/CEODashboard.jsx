@@ -4,14 +4,17 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
   Briefcase, AlertTriangle, CheckSquare, BarChart3, 
-  ArrowRight, Search, Filter, ShieldAlert 
+  ArrowRight, Search, Filter, ShieldAlert, ChevronDown, ChevronUp 
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import DetailedIssue from './DetailedIssue';
 
 const CEODashboard = () => {
-  const { projects, issues, approvals } = useData();
+  const { projects, issues, approvals, tasks, users } = useData();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+
+  const [expandedIssueId, setExpandedIssueId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -214,21 +217,44 @@ const CEODashboard = () => {
                 {highSeverityIssues.slice(0, 4).map(issue => {
                   const proj = projects.find(p => String(p.id) === String(issue.projectId) || `p${p.id}` === issue.projectId);
                   return (
-                    <div key={issue.id} className="p-3 bg-red-50  rounded-lg border border-red-100 ">
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-semibold text-sm text-slate-900  line-clamp-1 pr-2">{issue.title}</h4>
-                        <span className="text-[10px] uppercase font-bold text-red-600 bg-red-100  px-1.5 py-0.5 rounded shrink-0">High</span>
+                    <div key={issue.id} className="bg-red-50 rounded-lg border border-red-100 overflow-hidden">
+                      <div className="p-3">
+                        <div className="flex justify-between items-start mb-1">
+                          <h4 className="font-semibold text-sm text-slate-900 line-clamp-1 pr-2">{issue.title}</h4>
+                          <span className="text-[10px] uppercase font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded shrink-0">High</span>
+                        </div>
+                        <p className="text-xs text-slate-600 mb-2">{proj?.name}</p>
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-slate-500">{issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : ''}</span>
+                          <div className="flex gap-2 items-center">
+                            <button 
+                              onClick={() => navigate(`/portal/projects/${proj?.id}`)}
+                              className="font-bold text-red-700 hover:underline"
+                            >
+                              Go to Project &rarr;
+                            </button>
+                            <button
+                              onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
+                              className="p-1 hover:bg-red-200 rounded text-red-700 transition-colors"
+                            >
+                              {expandedIssueId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-xs text-slate-600  mb-2">{proj?.name}</p>
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-slate-500">{issue.dateReported}</span>
-                        <button 
-                          onClick={() => navigate(`/portal/projects/${proj?.id}`)}
-                          className="font-bold text-red-700  hover:underline"
-                        >
-                          Investigate &rarr;
-                        </button>
-                      </div>
+                      
+                      <AnimatePresence>
+                        {expandedIssueId === issue.id && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden border-t border-red-200 bg-white"
+                          >
+                            <DetailedIssue issue={issue} projects={projects} tasks={tasks} users={users} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   );
                 })}
