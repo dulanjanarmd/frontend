@@ -35,8 +35,12 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
   const [pmReply, setPmReply] = useState('');
   const [showPmReply, setShowPmReply] = useState(false);
 
-  // Local state for audit trail (would be persisted in real backend)
-  const [auditTrail, setAuditTrail] = useState(approval.auditTrail || [
+  const storedAuditTrail = typeof approval.auditTrail === 'string'
+    ? (() => {
+        try { return JSON.parse(approval.auditTrail); } catch { return []; }
+      })()
+    : approval.auditTrail;
+  const [auditTrail, setAuditTrail] = useState(storedAuditTrail?.length ? storedAuditTrail : [
     {
       actor: 'Project Manager',
       action: 'Created approval request',

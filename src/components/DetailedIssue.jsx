@@ -32,6 +32,8 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
   
   const reporterStr = String(issue.reportedBy || issue.reportedById || '');
   const reporterUser = users.find(u => String(u.id) === reporterStr) || { name: 'Unknown', role: '' };
+  const getFileUrl = (url) => url?.startsWith('/uploads/') ? `http://localhost:8080${url}` : url;
+  const isImageFile = (url) => /\.(png|jpe?g|gif|webp|bmp)(\?.*)?$/i.test(url || '');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,20 +60,32 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
       });
       if (res.ok) {
         const json = await res.json();
-        setCommentPhoto(json.fullUrl);
+        setCommentPhoto(json.fullUrl || `http://localhost:8080${json.url}`);
+      } else {
+        const message = await res.text();
+        alert(message || `File upload failed (${res.status})`);
       }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'File upload failed. Please try again.');
+    }
     setUploading(false);
   };
 
   const submitComment = async () => {
-    if (!newComment.trim()) return;
-    const body = { message: newComment, commentType, photoUrl: commentPhoto };
+    if (!newComment.trim() && !commentPhoto) return;
+    const body = {
+      message: newComment.trim() || 'File attachment',
+      commentType,
+      photoUrl: commentPhoto || null
+    };
     const saved = await addIssueComment(String(issue.id).replace('i', ''), body);
     if (saved) {
       setComments([...comments, { ...saved, sender: currentUser }]);
       setNewComment('');
       setCommentPhoto('');
+    } else {
+      alert('Failed to add resolution note. Please try again.');
     }
     
     // Auto status update logic based on comment type and role
@@ -98,8 +112,14 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-    await updateIssue(issue.id, editData);
-    setIsEditModalOpen(false);
+    try {
+      const updated = await updateIssue(String(issue.id).replace(/^i/, ''), editData);
+      if (!updated) throw new Error('Failed to update issue');
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error('Error updating issue:', error);
+      alert(error.message || 'Failed to update issue. Please try again.');
+    }
   };
 
   const handleDelete = async () => {
@@ -174,7 +194,13 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
       <div className="flex gap-6 mb-8 flex-col lg:flex-row">
         {issue.photoUrl && (
           <div className="w-full lg:w-1/3 rounded-lg overflow-hidden shrink-0 border border-border">
-            <img src={issue.photoUrl} alt="Issue Evidence" className="w-full h-full object-cover" />
+            {isImageFile(issue.photoUrl) ? (
+              <img src={getFileUrl(issue.photoUrl)} alt="Issue Evidence" className="w-full h-full object-cover" />
+            ) : (
+              <a href={getFileUrl(issue.photoUrl)} target="_blank" rel="noreferrer" className="block p-4 text-sm text-indigo-600 hover:underline">
+                Open issue attachment
+              </a>
+            )}
           </div>
         )}
         <div className="flex-1">
@@ -221,7 +247,13 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
                   {isSolution && <span className="text-xs font-bold text-green-700 uppercase mb-1 block">Solution Provided</span>}
                   {isInfoReq && <span className="text-xs font-bold text-orange-700 uppercase mb-1 block">Information Requested</span>}
                   <p className="text-sm text-slate-700">{item.message}</p>
-                  {item.photoUrl && <img src={item.photoUrl} alt="Attached" className="mt-2 rounded max-w-xs max-h-40 border border-slate-200" />}
+                  {item.photoUrl && (isImageFile(item.photoUrl) ? (
+                    <img src={getFileUrl(item.photoUrl)} alt="Attached" className="mt-2 rounded max-w-xs max-h-40 border border-slate-200" />
+                  ) : (
+                    <a href={getFileUrl(item.photoUrl)} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-indigo-600 hover:underline">
+                      Open attached file
+                    </a>
+                  ))}
                 </div>
               );
             })}
@@ -264,7 +296,7 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
                   {uploading ? 'Uploading...' : commentPhoto ? 'File Attached' : 'Attach File'}
                 </label>
               </div>
-              <button onClick={submitComment} disabled={uploading || !newComment.trim()} className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+              <button onClick={submitComment} disabled={uploading || (!newComment.trim() && !commentPhoto)} className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">
                 Send
               </button>
             </div>

@@ -6,12 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const Projects = () => {
-  const { projects, updateProject, deleteProject, users } = useData();
+  const { projects, tasks, updateProject, deleteProject, users } = useData();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   
   const isSiteEngineer = currentUser?.role === 'site_engineer';
   const isClient = currentUser?.role === 'client';
+  const currentUserId = String(currentUser?.id || '');
+  const visibleProjects = isSiteEngineer
+    ? projects.filter(project => tasks.some(task => {
+        const taskProjectId = String(task.projectId || '').replace(/^p/, '');
+        const assignedTo = String(task.assignedTo || '').replace(/^u/, '');
+        return taskProjectId === String(project.id) && assignedTo === currentUserId;
+      }))
+    : projects;
 
   // Modals state
   const [modalType, setModalType] = useState(null); // 'create', 'edit', 'milestones', 'status'
@@ -146,7 +154,7 @@ const Projects = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {projects.map((project) => (
+              {visibleProjects.map((project) => (
                 <tr key={project.id} className="hover:bg-slate-50/50 :bg-slate-800/50 transition-colors">
                   <td className="px-6 py-4">
                     <p className="font-bold text-base text-slate-900 ">{project.name}</p>

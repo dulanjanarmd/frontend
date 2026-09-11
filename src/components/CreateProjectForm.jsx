@@ -25,7 +25,7 @@ const CreateProjectForm = () => {
   const [milestones, setMilestones] = useState([]);
 
   // Filter clients
-  const clients = users.filter(u => u.role === 'client');
+  const clients = users.filter(u => String(u.role || '').toLowerCase() === 'client');
 
   const handleSubmit = async (e) => {
     e.preventDefault();

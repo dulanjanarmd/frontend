@@ -35,14 +35,7 @@ const SiteEngineerDashboard = () => {
   const myProjects = useMemo(() => {
     const projectIds = new Set();
     myTasks.forEach(t => projectIds.add(String(t.projectId).replace('p', '')));
-    logs.forEach(l => {
-      if (String(l.submittedBy) === String(currentUser?.id) || `u${l.submittedBy}` === currentUser?.id) {
-        projectIds.add(String(l.projectId).replace('p', ''));
-      }
-    });
-    
-    const filtered = projects.filter(p => projectIds.has(String(p.id)));
-    return filtered.length > 0 ? filtered : projects.slice(0, 3);
+    return projects.filter(p => projectIds.has(String(p.id)));
   }, [projects, myTasks, logs, currentUser]);
 
   // For Progress Logs This Week

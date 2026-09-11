@@ -58,8 +58,6 @@ const AdminPortal = () => {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
-      const userId = String(selectedUser.id).replace('u', '');
-      
       // Update basic user info (name, email, role for non-protected users)
       const updateData = {
         name: editUser.name,
@@ -70,22 +68,9 @@ const AdminPortal = () => {
       if (selectedUser?.role !== 'admin' && selectedUser?.role !== 'ceo') {
         updateData.role = editUser.role;
       }
-      
-      const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
-      
+
+      await updateUser(selectedUser.id, updateData);
       setShowEditUserModal(false);
-      window.location.reload(); // Refresh to get updated data
     } catch (error) {
       console.error('Error updating user:', error);
       alert('Failed to update user. Please try again.');

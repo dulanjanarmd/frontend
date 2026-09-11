@@ -49,10 +49,15 @@ const ProjectOverviewTab = ({ project }) => {
 
   const closeModal = () => setModalType(null);
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    updateProject(project.id, formData);
-    closeModal();
+    try {
+      await updateProject(project.id, formData);
+      closeModal();
+    } catch (error) {
+      console.error('Error updating project details:', error);
+      alert('Failed to update project details. Please try again.');
+    }
   };
 
   const handleStatusSubmit = (e) => {
@@ -332,6 +337,7 @@ const ProjectOverviewTab = ({ project }) => {
                 <div>
                   <label className="block text-sm font-medium mb-1">Status</label>
                   <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={statusData.status} onChange={e => setStatusData({ ...statusData, status: e.target.value })}>
+                    <option value="Not Started">Not Started</option>
                     <option value="Planning">Planning</option>
                     <option value="In Progress">In Progress</option>
                     <option value="On Hold">On Hold</option>

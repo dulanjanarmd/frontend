@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Filter, Eye, AlertTriangle, Lock } from 'lucide-react';
+import { Plus, Filter, Eye, AlertTriangle, Lock, Edit, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskDetailModal from './TaskDetailModal';
 
@@ -22,10 +22,11 @@ const PRIORITY_STYLES = {
 };
 
 const ProjectTasksTab = ({ projectId, project }) => {
-  const { tasks, addTask, users } = useData();
+  const { tasks, addTask, updateTask, deleteTask, users } = useData();
   const { currentUser } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [statusFilter, setStatusFilter] = useState('All');
   const [assigneeFilter, setAssigneeFilter] = useState('All');
@@ -70,6 +71,19 @@ const ProjectTasksTab = ({ projectId, project }) => {
     const rawAssigneeId = formData.assignedTo.toString().replace(/^u/, '');
 
     try {
+      if (isEditing) {
+        await updateTask(selectedTask.id, {
+          title: formData.title,
+          description: formData.description,
+          priority: formData.priority,
+          dueDate: formData.dueDate || null
+        });
+        setIsModalOpen(false);
+        setIsEditing(false);
+        setSelectedTask(null);
+        return;
+      }
+
       const res = await fetch('http://localhost:8080/api/tasks', {
         method: 'POST',
         headers: {
@@ -110,12 +124,37 @@ const ProjectTasksTab = ({ projectId, project }) => {
       });
 
       setIsModalOpen(false);
+      setIsEditing(false);
       setFormData({ title: '', description: '', assignedTo: '', priority: 'Medium', dueDate: '', milestoneId: '' });
     } catch (err) {
       console.error('Error creating task:', err);
       alert('Failed to save task. Please try again.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const openEditTask = (task) => {
+    setSelectedTask(task);
+    setIsEditing(true);
+    setFormData({
+      title: task.title || '',
+      description: task.description || '',
+      assignedTo: task.assignedTo || '',
+      priority: task.priority || 'Medium',
+      dueDate: task.dueDate || '',
+      milestoneId: task.milestoneId || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteTask = async (task) => {
+    if (!window.confirm(`Delete task "${task.title}"?`)) return;
+    try {
+      await deleteTask(task.id);
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      alert('Failed to delete task. Please try again.');
     }
   };
 
@@ -135,7 +174,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
         </div>
         {isPM && (
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => { setIsEditing(false); setSelectedTask(null); setIsModalOpen(true); }}
             className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
           >
             <Plus className="w-5 h-5 mr-2" />
@@ -232,6 +271,16 @@ const ProjectTasksTab = ({ projectId, project }) => {
                             <span className="text-xs text-slate-500 truncate max-w-[80px]">{assignee?.name || '—'}</span>
                           </div>
                           <div className="flex items-center gap-1">
+                            {isPM && (
+                              <>
+                                <button type="button" onClick={e => { e.stopPropagation(); openEditTask(task); }} className="p-1 text-slate-400 hover:text-primary" title="Edit task">
+                                  <Edit className="w-3.5 h-3.5" />
+                                </button>
+                                <button type="button" onClick={e => { e.stopPropagation(); handleDeleteTask(task); }} className="p-1 text-slate-400 hover:text-red-500" title="Delete task">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </>
+                            )}
                             {task.dueDate && (
                               <span className="text-xs text-slate-400">{task.dueDate}</span>
                             )}
@@ -261,7 +310,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
               <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
                 <span className="text-xl">×</span>
               </button>
-              <h2 className="text-xl font-bold mb-1">Create New Task</h2>
+              <h2 className="text-xl font-bold mb-1">{isEditing ? 'Edit Task' : 'Create New Task'}</h2>
               <p className="text-sm text-slate-500 mb-5">For: <span className="font-semibold text-slate-700 ">{project?.name}</span></p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -311,9 +360,9 @@ const ProjectTasksTab = ({ projectId, project }) => {
                 </div>
 
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-md transition-colors">Cancel</button>
+                  <button type="button" onClick={() => { setIsModalOpen(false); setIsEditing(false); }} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-md transition-colors">Cancel</button>
                   <button type="submit" disabled={submitting} className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 disabled:opacity-50">
-                    {submitting ? 'Saving...' : 'Create & Assign'}
+                    {submitting ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create & Assign')}
                   </button>
                 </div>
               </form>

@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import {
   X, User, Calendar, Flag, Tag, ListTodo, CheckCircle2,
-  RotateCcw, Lock, Image as ImageIcon, AlertTriangle, MessageSquare, Send
+  RotateCcw, Lock, Image as ImageIcon, AlertTriangle, MessageSquare, Send, UploadCloud
 } from 'lucide-react';
 
 const PRIORITY_STYLES = {
@@ -25,6 +25,7 @@ const TaskDetailModal = ({ task, project, onClose }) => {
   const { updateTask, users } = useData();
   const { currentUser } = useAuth();
   const [evidenceUrl, setEvidenceUrl] = useState(task.evidence || '');
+  const [uploadingEvidence, setUploadingEvidence] = useState(false);
   const [completionComment, setCompletionComment] = useState('');
   const [newComment, setNewComment] = useState('');
   const [reAssignId, setReAssignId] = useState('');
@@ -65,6 +66,32 @@ const TaskDetailModal = ({ task, project, onClose }) => {
     
     updateTask(task.id, updates);
     onClose();
+  };
+
+  const handleEvidenceUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingEvidence(true);
+    const body = new FormData();
+    body.append('file', file);
+    try {
+      const response = await fetch('http://localhost:8080/api/files/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+        body
+      });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Upload failed (${response.status})`);
+      }
+      const uploaded = await response.json();
+      setEvidenceUrl(uploaded.fullUrl || `http://localhost:8080${uploaded.url}`);
+    } catch (error) {
+      console.error('Error uploading evidence:', error);
+      alert(error.message || 'Failed to upload evidence. Please try again.');
+    } finally {
+      setUploadingEvidence(false);
+    }
   };
 
   const handleAddComment = (e) => {
@@ -188,14 +215,16 @@ const TaskDetailModal = ({ task, project, onClose }) => {
                   {(isSiteEngineer && isAssigned && task.status === 'In Progress') ? (
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs font-medium text-slate-500 mb-1">Evidence Photo URL <span className="text-red-500">*</span></label>
+                        <label className="block text-xs font-medium text-slate-500 mb-1">Evidence Photo <span className="text-red-500">*</span></label>
                         <input
-                          type="url"
-                          placeholder="Paste image URL as evidence..."
+                          type="file"
+                          accept="image/*"
                           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                          value={evidenceUrl}
-                          onChange={e => setEvidenceUrl(e.target.value)}
+                          onChange={handleEvidenceUpload}
+                          disabled={uploadingEvidence}
                         />
+                        {uploadingEvidence && <p className="text-xs text-slate-400 mt-1">Uploading evidence...</p>}
+                        {evidenceUrl && <p className="text-xs text-green-600 mt-1 flex items-center gap-1"><UploadCloud className="w-3 h-3" /> Evidence uploaded</p>}
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-slate-500 mb-1">Completion Note (Optional)</label>
@@ -209,7 +238,7 @@ const TaskDetailModal = ({ task, project, onClose }) => {
                       </div>
                       <button
                         onClick={handleEvidenceSubmit}
-                        disabled={!evidenceUrl}
+                        disabled={!evidenceUrl || uploadingEvidence}
                         className="w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50 shadow-sm"
                       >
                         Submit Evidence & Mark Complete

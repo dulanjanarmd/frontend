@@ -1,6 +1,30 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 
+const formatProjectStatus = (status) => {
+  const labels = {
+    NOT_STARTED: 'Not Started',
+    PLANNING: 'Planning',
+    IN_PROGRESS: 'In Progress',
+    ON_HOLD: 'On Hold',
+    COMPLETED: 'Completed',
+    CANCELLED: 'Cancelled'
+  };
+  return labels[status] || status || 'Planning';
+};
+
+const toProjectStatus = (status) => {
+  const values = {
+    'Not Started': 'NOT_STARTED',
+    Planning: 'PLANNING',
+    'In Progress': 'IN_PROGRESS',
+    'On Hold': 'ON_HOLD',
+    Completed: 'COMPLETED',
+    Cancelled: 'CANCELLED'
+  };
+  return values[status] || status;
+};
+
 const DataContext = createContext();
 
 export const useData = () => {
@@ -37,12 +61,13 @@ export const DataProvider = ({ children }) => {
           setProjects(rawP.map(p => ({
             ...p,
             progress: p.progressPercentage,
+            status: formatProjectStatus(p.status),
             client: p.client?.name || 'Unknown',
             clientId: p.client?.id ? `u${p.client.id}` : null
           })));
         }
 
-        const uRes = await fetch('http://localhost:8080/api/admin/users', { headers });
+        const uRes = await fetch('http://localhost:8080/api/users', { headers });
         if (uRes.ok) {
           const rawU = await uRes.json();
           setUsers(rawU.map(u => ({
@@ -59,6 +84,8 @@ export const DataProvider = ({ children }) => {
             if (s === 'TO_DO') return 'To Do';
             if (s === 'IN_PROGRESS') return 'In Progress';
             if (s === 'COMPLETED') return 'Completed';
+            if (s === 'REOPENED') return 'Reopened';
+            if (s === 'CLOSED') return 'Closed';
             return s || 'To Do';
           };
           setTasks(rawT.map(t => ({
@@ -90,6 +117,7 @@ export const DataProvider = ({ children }) => {
             ...a,
             projectId: `p${a.project?.id}`,
             clientId: a.client?.id ? `u${a.client.id}` : null,
+            auditTrail: typeof a.auditTrail === 'string' ? JSON.parse(a.auditTrail) : (a.auditTrail || []),
             status: a.status ? (a.status.charAt(0) + a.status.slice(1).toLowerCase()) : 'Pending',
             documentUrl: '#'
           })));
@@ -141,7 +169,42 @@ export const DataProvider = ({ children }) => {
       throw err;
     }
   };
-  const updateProject = (id, updates) => setProjects(projects.map(p => p.id === id ? { ...p, ...updates } : p));
+  const updateProject = async (id, updates) => {
+    const projectId = String(id).replace(/^p/, '');
+    const currentProject = projects.find(project => project.id === id);
+    const status = toProjectStatus(updates.status || currentProject?.status);
+    const progress = updates.progress ?? currentProject?.progress ?? 0;
+    const payload = {
+      name: updates.name ?? currentProject?.name,
+      location: updates.location ?? currentProject?.location,
+      startDate: updates.startDate ?? currentProject?.startDate,
+      endDate: updates.endDate ?? currentProject?.endDate,
+      description: updates.description ?? currentProject?.description,
+      status,
+      progressPercentage: Number(progress),
+      budget: currentProject?.budget,
+      client: (updates.clientId ?? currentProject?.clientId)
+        ? { id: String(updates.clientId ?? currentProject.clientId).replace(/^u/, '') }
+        : undefined
+    };
+
+    const response = await fetch(`http://localhost:8080/api/projects/${projectId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${currentUser.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error('Failed to update project');
+
+    setProjects(projects.map(project => project.id === id ? {
+      ...project,
+      ...updates,
+      status: formatProjectStatus(status),
+      progress: Number(progress)
+    } : project));
+  };
   const deleteProject = async (id) => {
     try {
       const res = await fetch(`http://localhost:8080/api/projects/${id}`, {
@@ -258,8 +321,53 @@ export const DataProvider = ({ children }) => {
     }
   };
   
-  const addTask = (task) => setTasks([...tasks, { ...task, id: `t${Date.now()}` }]);
-  const updateTask = (id, updates) => setTasks(tasks.map(t => t.id === id ? { ...t, ...updates } : t));
+  const addTask = (task) => setTasks([...tasks, task]);
+  const updateTask = async (id, updates) => {
+    const taskId = String(id).replace(/^t/, '');
+    const currentTask = tasks.find(task => String(task.id) === String(id));
+    const statusValues = {
+      'To Do': 'TO_DO',
+      'In Progress': 'IN_PROGRESS',
+      Completed: 'COMPLETED',
+      Reopened: 'REOPENED',
+      Closed: 'CLOSED'
+    };
+    const payload = {
+      title: updates.title ?? currentTask?.title,
+      description: updates.description ?? currentTask?.description,
+      priority: updates.priority ?? currentTask?.priority,
+      dueDate: updates.dueDate ?? currentTask?.dueDate ?? null,
+      status: statusValues[updates.status] || updates.status,
+      completionEvidence: updates.evidence ?? currentTask?.evidence ?? null
+    };
+    const response = await fetch(`http://localhost:8080/api/tasks/${taskId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${currentUser.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error('Failed to update task');
+    setTasks(tasks.map(task => String(task.id) === String(id) ? {
+      ...task,
+      ...updates,
+      status: updates.status || task.status,
+      evidence: updates.evidence ?? task.evidence
+    } : task));
+  };
+  const deleteTask = async (id) => {
+    const taskId = String(id).replace(/^t/, '');
+    const response = await fetch(`http://localhost:8080/api/tasks/${taskId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${currentUser.token}` }
+    });
+    if (!response.ok) {
+      const message = await response.text();
+      throw new Error(message || `Failed to delete task (${response.status})`);
+    }
+    setTasks(tasks.filter(task => String(task.id) !== String(id)));
+  };
 
   const addLog = async (log) => {
     try {
@@ -428,23 +536,41 @@ export const DataProvider = ({ children }) => {
   const updateIssue = async (id, updates) => {
     try {
       const rawId = String(id).replace('i', '');
+      const body = {
+        title: updates.title,
+        description: updates.description,
+        severity: updates.severity,
+        location: updates.location || null,
+        equipmentInvolved: updates.equipmentInvolved || null,
+        estimatedDelayDays: updates.estimatedDelayDays == null || updates.estimatedDelayDays === ''
+          ? null
+          : Number(updates.estimatedDelayDays)
+      };
       const res = await fetch(`http://localhost:8080/api/issues/${rawId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(body)
       });
       if (res.ok) {
-        const updated = await res.json();
-        setIssues(prev => prev.map(i => String(i.id) === String(id) || String(i.id) === `i${rawId}` ? { ...i, ...updated } : i));
+        setIssues(prev => prev.map(i => String(i.id) === String(id) || String(i.id) === `i${rawId}` ? {
+          ...i,
+          ...updates,
+          id: i.id,
+          projectId: i.projectId,
+          taskId: i.taskId,
+          reportedBy: i.reportedBy,
+          assignee: i.assignee
+        } : i));
         return true;
       }
-      return false;
+      const message = await res.text();
+      throw new Error(message || `Failed to update issue (${res.status})`);
     } catch (err) {
       console.error(err);
-      return false;
+      throw err;
     }
   };
 
@@ -545,14 +671,22 @@ export const DataProvider = ({ children }) => {
     try {
       // Mirror to backend (strip prefix if any)
       const numId = typeof id === 'string' ? id.replace('a', '') : id;
-      await fetch(`http://localhost:8080/api/client/approvals/${numId}`, {
+      const response = await fetch(`http://localhost:8080/api/client/approvals/${numId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: updates.status })
+        body: JSON.stringify({
+          status: updates.status,
+          auditTrail: updates.auditTrail,
+          feedback: updates.feedback,
+          pmReply: updates.pmReply
+        })
       });
+      if (!response.ok) {
+        throw new Error(await response.text() || `Approval update failed (${response.status})`);
+      }
     } catch (err) { console.error('updateApproval:', err); }
   };
 
@@ -575,7 +709,8 @@ export const DataProvider = ({ children }) => {
           description: request.description,
           projectId: numProjectId,
           status: 'PENDING',
-          dateRequested: new Date().toISOString().split('T')[0]
+          dateRequested: new Date().toISOString().split('T')[0],
+          auditTrail: request.auditTrail || []
         })
       });
       if (res.ok) {
@@ -585,6 +720,7 @@ export const DataProvider = ({ children }) => {
           ...saved,
           projectId: `p${saved.project?.id}`,
           clientId: saved.client?.id ? `u${saved.client.id}` : null,
+          auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
           status: saved.status ? (saved.status.charAt(0) + saved.status.slice(1).toLowerCase()) : 'Pending',
           documentUrl: '#'
         } : a));
@@ -626,7 +762,7 @@ export const DataProvider = ({ children }) => {
 
   const value = {
     projects, addProject, updateProject, deleteProject,
-    tasks, addTask, updateTask,
+    tasks, addTask, updateTask, deleteTask,
     logs, addLog, updateLog, deleteLog,
     approvals, updateApproval, addApprovalRequest,
     consultations, addConsultation, updateConsultation,

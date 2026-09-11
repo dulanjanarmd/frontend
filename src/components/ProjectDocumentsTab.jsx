@@ -31,32 +31,67 @@ const ProjectDocumentsTab = ({ project }) => {
   const { currentUser } = useAuth();
   const [documents, setDocuments] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [formData, setFormData] = useState({ name: '', category: 'design', url: '', note: '' });
+  const [formData, setFormData] = useState({ name: '', category: 'design', file: null, note: '' });
+  const projectId = String(project?.id || '').replace(/^p/, '');
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
 
-  const handleUpload = (e) => {
-    e.preventDefault();
-    if (!formData.name) return;
-
-    const newDoc = {
-      id: `d${Date.now()}`,
-      name: formData.name,
-      category: formData.category,
-      url: formData.url || '#',
-      note: formData.note,
-      uploadedBy: currentUser?.name || 'PM',
-      uploadedAt: new Date().toISOString().split('T')[0],
-      size: null
+  React.useEffect(() => {
+    const loadDocuments = async () => {
+      const response = await fetch(`http://localhost:8080/api/projects/${projectId}/documents`, {
+        headers: { Authorization: `Bearer ${currentUser?.token}` }
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setDocuments(data.map(doc => ({
+        ...doc,
+        url: `http://localhost:8080${doc.fileUrl}`,
+        uploadedBy: doc.uploadedBy?.name || 'Unknown',
+        uploadedAt: doc.createdAt || '—'
+      })));
     };
+    if (projectId && currentUser?.token) loadDocuments();
+  }, [projectId, currentUser?.token]);
 
-    setDocuments([newDoc, ...documents]);
-    setFormData({ name: '', category: 'design', url: '', note: '' });
-    setIsUploading(false);
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!formData.file) return;
+    try {
+      const body = new FormData();
+      body.append('file', formData.file);
+      body.append('name', formData.name || formData.file.name);
+      body.append('category', formData.category);
+      body.append('note', formData.note);
+      const response = await fetch(`http://localhost:8080/api/projects/${projectId}/documents`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+        body
+      });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Upload failed (${response.status})`);
+      }
+      const doc = await response.json();
+      setDocuments(current => [{
+        ...doc,
+        url: `http://localhost:8080${doc.fileUrl}`,
+        uploadedBy: doc.uploadedBy?.name || currentUser.name,
+        uploadedAt: 'Today'
+      }, ...current]);
+      setFormData({ name: '', category: 'design', file: null, note: '' });
+      setIsUploading(false);
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      alert(error.message || 'Failed to upload document. Please try again.');
+    }
   };
 
-  const handleDelete = (id) => {
-    setDocuments(documents.filter(d => d.id !== id));
+  const handleDelete = async (id) => {
+    const response = await fetch(`http://localhost:8080/api/projects/${projectId}/documents/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${currentUser.token}` }
+    });
+    if (response.ok) setDocuments(current => current.filter(d => d.id !== id));
   };
 
   // Group documents by category
@@ -120,13 +155,12 @@ const ProjectDocumentsTab = ({ project }) => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">File URL (mock upload)</label>
+              <label className="block text-sm font-medium mb-1">File <span className="text-red-500">*</span></label>
               <input
-                type="url"
-                placeholder="https://example.com/document.pdf"
+                required
+                type="file"
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                value={formData.url}
-                onChange={e => setFormData({...formData, url: e.target.value})}
+                onChange={e => setFormData({...formData, file: e.target.files?.[0] || null, name: e.target.files?.[0]?.name || formData.name})}
               />
             </div>
             <div>
