@@ -403,6 +403,35 @@ export const DataProvider = ({ children }) => {
   const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);
   const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
 
+  const getGlobalMessages = async (projectId) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/messages/${projectId}`, {
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      return res.ok ? await res.json() : [];
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
+
+  const sendGlobalMessage = async (projectId, messageText) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/messages/${projectId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ messageText })
+      });
+      return res.ok ? await res.json() : null;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
   const value = {
     projects, addProject, updateProject, deleteProject,
     tasks, addTask, updateTask,
@@ -410,7 +439,8 @@ export const DataProvider = ({ children }) => {
     approvals, updateApproval, addApprovalRequest,
     consultations, addConsultation, updateConsultation,
     users,
-    issues, addIssue, updateIssue, getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus
+    issues, addIssue, updateIssue, getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus,
+    getGlobalMessages, sendGlobalMessage
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

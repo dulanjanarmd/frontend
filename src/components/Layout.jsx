@@ -16,6 +16,7 @@ import {
   Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FloatingChatWidget from './FloatingChatWidget';
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
@@ -153,10 +154,11 @@ const Layout = () => {
     <div className="min-h-screen bg-slate-100  transition-colors duration-300 flex flex-col font-sans">
       <Navbar />
       
-      <main className="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto mt-4 md:mt-8">
+      <main className="flex-1 overflow-auto bg-slate-50 relative pb-10">
         <Outlet />
       </main>
 
+      <FloatingChatWidget />
     </div>
   );
 };

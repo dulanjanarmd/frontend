@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, Plus, X, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const SEVERITY_STYLES = {
   High: 'bg-red-100 text-red-700 border-red-200',
@@ -23,63 +24,27 @@ const STATUS_NEXT = {
 };
 
 const ProjectIssuesTab = ({ project }) => {
-  const { logs } = useData();
+  const { issues, updateIssueStatus } = useData();
   const { currentUser } = useAuth();
   
   const isCEO = currentUser?.role === 'ceo';
+  const navigate = useNavigate();
 
-  const [issues, setIssues] = useState(() => {
-    // Seed from logs that reported issues for this project
-    const projectId = project.id;
-    const seed = logs
-      .filter(l => (String(l.projectId) === String(projectId) || l.projectId === `p${projectId}`) && l.issues)
-      .map((l, idx) => ({
-        id: `li${idx}`,
-        title: 'Site Log Issue',
-        description: l.issues,
-        severity: 'Medium',
-        status: 'Open',
-        reportedDate: l.date,
-        resolution: '',
-        expanded: false
-      }));
-    return seed;
-  });
+  // Filter global issues to only those belonging to this project
+  const projectIssues = issues.filter(i => 
+    String(i.projectId) === String(project.id) || i.projectId === `p${project.id}`
+  );
 
-  const [isAdding, setIsAdding] = useState(false);
-  const [newForm, setNewForm] = useState({ title: '', description: '', severity: 'Medium' });
   const [expandedId, setExpandedId] = useState(null);
-  const [resolutionText, setResolutionText] = useState({});
 
-  const openCount = issues.filter(i => i.status === 'Open').length;
-  const resolvedCount = issues.filter(i => i.status === 'Resolved').length;
-
-  const handleAdd = (e) => {
-    e.preventDefault();
-    const newIssue = {
-      id: `i${Date.now()}`,
-      title: newForm.title,
-      description: newForm.description,
-      severity: newForm.severity,
-      status: 'Open',
-      reportedDate: new Date().toISOString().split('T')[0],
-      resolution: ''
-    };
-    setIssues([newIssue, ...issues]);
-    setNewForm({ title: '', description: '', severity: 'Medium' });
-    setIsAdding(false);
-  };
+  const openCount = projectIssues.filter(i => i.status === 'Open').length;
+  const resolvedCount = projectIssues.filter(i => i.status === 'Resolved').length;
 
   const advanceStatus = (id) => {
-    setIssues(issues.map(i => i.id === id ? { ...i, status: STATUS_NEXT[i.status] } : i));
-  };
-
-  const saveResolution = (id) => {
-    setIssues(issues.map(i => i.id === id ? { ...i, resolution: resolutionText[id] || '', status: 'Resolved' } : i));
-  };
-
-  const handleDelete = (id) => {
-    setIssues(issues.filter(i => i.id !== id));
+    const issue = projectIssues.find(i => i.id === id);
+    if (issue) {
+      updateIssueStatus(id, STATUS_NEXT[issue.status]);
+    }
   };
 
   return (
@@ -94,7 +59,7 @@ const ProjectIssuesTab = ({ project }) => {
         </div>
         {!isCEO && (
           <button
-            onClick={() => setIsAdding(true)}
+            onClick={() => navigate('/portal/issues')}
             className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30 font-bold"
           >
             <Plus className="w-5 h-5 mr-2" />
@@ -106,7 +71,7 @@ const ProjectIssuesTab = ({ project }) => {
       {/* Summary chips */}
       <div className="flex gap-3 flex-wrap">
         {['Open', 'In Progress', 'Resolved'].map(s => {
-          const count = issues.filter(i => i.status === s).length;
+          const count = projectIssues.filter(i => i.status === s).length;
           return (
             <div key={s} className={`px-3 py-1.5 rounded-full text-sm font-medium border ${STATUS_STYLES[s]} border-current/20`}>
               {s}: {count}
@@ -115,67 +80,8 @@ const ProjectIssuesTab = ({ project }) => {
         })}
       </div>
 
-      {/* Add form */}
-      <AnimatePresence>
-        {isAdding && (
-          <motion.form
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            onSubmit={handleAdd}
-            className="glass-card p-5 border-2 border-red-300/40 overflow-hidden"
-          >
-            <h3 className="font-semibold mb-4 flex items-center">
-              <AlertTriangle className="w-4 h-4 mr-2 text-red-500" />
-              Report New Issue
-            </h3>
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium mb-1">Issue Title <span className="text-red-500">*</span></label>
-                  <input
-                    required type="text"
-                    placeholder="e.g. Material delivery delayed"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 outline-none"
-                    value={newForm.title}
-                    onChange={e => setNewForm({ ...newForm, title: e.target.value })}
-                    autoFocus
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Severity</label>
-                  <select
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                    value={newForm.severity}
-                    onChange={e => setNewForm({ ...newForm, severity: e.target.value })}
-                  >
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Description <span className="text-red-500">*</span></label>
-                <textarea
-                  required rows="3"
-                  placeholder="Describe the issue in detail..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 outline-none resize-none"
-                  value={newForm.description}
-                  onChange={e => setNewForm({ ...newForm, description: e.target.value })}
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setIsAdding(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors shadow-lg shadow-red-500/20">Report Issue</button>
-              </div>
-            </div>
-          </motion.form>
-        )}
-      </AnimatePresence>
-
       {/* Issues list */}
-      {issues.length === 0 ? (
+      {projectIssues.length === 0 ? (
         <div className="glass-card p-12 text-center text-slate-500">
           <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-40" />
           <p className="text-lg font-medium">No issues reported. Great work!</p>
@@ -183,7 +89,7 @@ const ProjectIssuesTab = ({ project }) => {
         </div>
       ) : (
         <div className="space-y-3">
-          {issues.map((issue, idx) => (
+          {projectIssues.map((issue, idx) => (
             <motion.div
               key={issue.id}
               initial={{ opacity: 0, y: 10 }}
@@ -227,12 +133,6 @@ const ProjectIssuesTab = ({ project }) => {
                       >
                         {expandedId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
-                      <button
-                        onClick={() => handleDelete(issue.id)}
-                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 :bg-red-900/20 rounded-md transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
                     </div>
                   )}
                 </div>
@@ -248,34 +148,43 @@ const ProjectIssuesTab = ({ project }) => {
                 )}
               </div>
 
-              {/* Expandable: Add resolution comment */}
+              {/* Expandable: Show Details */}
               <AnimatePresence>
                 {expandedId === issue.id && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="border-t border-border bg-slate-50/50  px-5 py-4 overflow-hidden"
+                    className="border-t border-border bg-slate-50/50 px-5 py-4 overflow-hidden"
                   >
-                    <label className="block text-sm font-medium mb-2 flex items-center">
-                      <MessageSquare className="w-4 h-4 mr-2 text-slate-500" />
-                      Add Resolution / Comment
-                    </label>
-                    <div className="flex gap-2">
-                      <textarea
-                        rows="2"
-                        placeholder="Describe how this was resolved or add a comment..."
-                        className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
-                        value={resolutionText[issue.id] || ''}
-                        onChange={e => setResolutionText({ ...resolutionText, [issue.id]: e.target.value })}
-                      />
-                      <button
-                        onClick={() => saveResolution(issue.id)}
-                        className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors text-sm font-medium"
-                      >
-                        Save & Resolve
-                      </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                      <div>
+                        <span className="text-slate-500 block mb-1">Location / Area</span>
+                        <span className="font-medium text-slate-900">{issue.location || 'Not specified'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block mb-1">Equipment Involved</span>
+                        <span className="font-medium text-slate-900">{issue.equipmentInvolved || 'None'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block mb-1">Estimated Delay</span>
+                        <span className="font-medium text-slate-900">{issue.estimatedDelayDays ? `${issue.estimatedDelayDays} Days` : 'Unknown'}</span>
+                      </div>
+                      {issue.photoUrl && (
+                        <div>
+                          <span className="text-slate-500 block mb-1">Attached Document</span>
+                          <a href={issue.photoUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline font-medium">View File</a>
+                        </div>
+                      )}
                     </div>
+                    
+                    <button
+                      onClick={() => navigate('/portal/issues')}
+                      className="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-md transition-colors text-sm font-semibold flex items-center justify-center"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      View Full Discussion in Global Issues
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
