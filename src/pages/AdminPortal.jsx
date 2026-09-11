@@ -263,6 +263,7 @@ const AdminPortal = () => {
                   <option value="PROJECT_MANAGER">Project Manager</option>
                   <option value="SITE_ENGINEER">Site Engineer</option>
                   <option value="QUANTITY_SURVEYOR">Quantity Surveyor</option>
+                  <option value="CEO">CEO (Only one allowed)</option>
                 </select>
               </div>
 

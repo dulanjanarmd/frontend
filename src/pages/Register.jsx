@@ -9,8 +9,7 @@ const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    role: 'CLIENT'
+    password: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +22,7 @@ const Register = () => {
     setError('');
     
     try {
-      await register(formData.name, formData.email, formData.password, formData.role);
+      await register(formData.name, formData.email, formData.password, 'CLIENT');
       navigate('/portal');
     } catch (err) {
       setError(err.message);
@@ -94,17 +93,6 @@ const Register = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
-            </div>
-            <div>
-              <select 
-                className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all"
-                value={formData.role}
-                onChange={(e) => setFormData({...formData, role: e.target.value})}
-              >
-                <option value="CLIENT">Client</option>
-                <option value="SITE_ENGINEER">Site Engineer</option>
-                <option value="PROJECT_MANAGER">Project Manager</option>
-              </select>
             </div>
 
             <button 
