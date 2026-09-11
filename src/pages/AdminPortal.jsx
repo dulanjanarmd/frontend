@@ -59,13 +59,25 @@ const AdminPortal = () => {
     e.preventDefault();
     try {
       const userId = String(selectedUser.id).replace('u', '');
+      
+      // Update basic user info (name, email, role for non-protected users)
+      const updateData = {
+        name: editUser.name,
+        email: editUser.email
+      };
+      
+      // Only include role for non-protected users
+      if (selectedUser?.role !== 'admin' && selectedUser?.role !== 'ceo') {
+        updateData.role = editUser.role;
+      }
+      
       const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(editUser)
+        body: JSON.stringify(updateData)
       });
       
       if (!response.ok) {
@@ -263,7 +275,6 @@ const AdminPortal = () => {
                   <option value="PROJECT_MANAGER">Project Manager</option>
                   <option value="SITE_ENGINEER">Site Engineer</option>
                   <option value="QUANTITY_SURVEYOR">Quantity Surveyor</option>
-                  <option value="CEO">CEO (Only one allowed)</option>
                 </select>
               </div>
 
@@ -328,25 +339,29 @@ const AdminPortal = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
-                <select
-                  value={editUser.role}
-                  onChange={(e) => setEditUser({...editUser, role: e.target.value})}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={selectedUser?.role === 'admin'}
-                >
-                  <option value="CLIENT">Client</option>
-                  <option value="CEO">CEO</option>
-                  <option value="PROJECT_MANAGER">Project Manager</option>
-                  <option value="SITE_ENGINEER">Site Engineer</option>
-                  <option value="QUANTITY_SURVEYOR">Quantity Surveyor</option>
-                  {selectedUser?.role === 'admin' && <option value="ADMIN">Admin</option>}
-                </select>
-                {selectedUser?.role === 'admin' && (
-                  <p className="text-xs text-slate-500 mt-1">Admin role cannot be changed</p>
-                )}
-              </div>
+              {(selectedUser?.role !== 'admin' && selectedUser?.role !== 'ceo') && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                  <select
+                    value={editUser.role}
+                    onChange={(e) => setEditUser({...editUser, role: e.target.value})}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="CLIENT">Client</option>
+                    <option value="PROJECT_MANAGER">Project Manager</option>
+                    <option value="SITE_ENGINEER">Site Engineer</option>
+                    <option value="QUANTITY_SURVEYOR">Quantity Surveyor</option>
+                  </select>
+                </div>
+              )}
+
+              {(selectedUser?.role === 'admin' || selectedUser?.role === 'ceo') && (
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <p className="text-sm text-slate-600">
+                    <strong>Note:</strong> CEO and Admin roles cannot be changed. Use the password reset button to update password.
+                  </p>
+                </div>
+              )}
 
               <div className="flex justify-end gap-3 pt-4">
                 <button
