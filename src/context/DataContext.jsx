@@ -37,7 +37,8 @@ export const DataProvider = ({ children }) => {
           setProjects(rawP.map(p => ({
             ...p,
             progress: p.progressPercentage,
-            client: p.client?.name || 'Unknown'
+            client: p.client?.name || 'Unknown',
+            clientId: p.client?.id ? `u${p.client.id}` : null
           })));
         }
 
@@ -88,6 +89,8 @@ export const DataProvider = ({ children }) => {
           setApprovals(rawA.map(a => ({
             ...a,
             projectId: `p${a.project?.id}`,
+            clientId: a.client?.id ? `u${a.client.id}` : null,
+            status: a.status ? (a.status.charAt(0) + a.status.slice(1).toLowerCase()) : 'Pending',
             documentUrl: '#'
           })));
         }
@@ -436,8 +439,58 @@ export const DataProvider = ({ children }) => {
     } catch (err) { console.error(err); }
   };
 
-  const updateApproval = (id, updates) => setApprovals(approvals.map(a => a.id === id ? { ...a, ...updates } : a));
-  const addApprovalRequest = (request) => setApprovals([...approvals, { ...request, id: `a${Date.now()}` }]);
+  const updateApproval = async (id, updates) => {
+    // Optimistically update local state
+    setApprovals(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
+    try {
+      // Mirror to backend (strip prefix if any)
+      const numId = typeof id === 'string' ? id.replace('a', '') : id;
+      await fetch(`http://localhost:8080/api/client/approvals/${numId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: updates.status })
+      });
+    } catch (err) { console.error('updateApproval:', err); }
+  };
+
+  const addApprovalRequest = async (request) => {
+    // Optimistically add to local state
+    const tempId = `a${Date.now()}`;
+    setApprovals(prev => [...prev, { ...request, id: tempId }]);
+    try {
+      const numProjectId = typeof request.projectId === 'string'
+        ? parseInt(request.projectId.replace('p', ''))
+        : request.projectId;
+      const res = await fetch('http://localhost:8080/api/client/approvals', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: request.title,
+          description: request.description,
+          projectId: numProjectId,
+          status: 'PENDING',
+          dateRequested: new Date().toISOString().split('T')[0]
+        })
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        // Replace temp entry with saved one
+        setApprovals(prev => prev.map(a => a.id === tempId ? {
+          ...saved,
+          projectId: `p${saved.project?.id}`,
+          clientId: saved.client?.id ? `u${saved.client.id}` : null,
+          status: saved.status ? (saved.status.charAt(0) + saved.status.slice(1).toLowerCase()) : 'Pending',
+          documentUrl: '#'
+        } : a));
+      }
+    } catch (err) { console.error('addApprovalRequest:', err); }
+  };
 
   const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);
   const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
