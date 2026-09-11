@@ -13,6 +13,7 @@ const ClientDashboard = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestText, setRequestText] = useState('');
   const [requestSent, setRequestSent] = useState(false);
 
@@ -99,6 +100,7 @@ const ClientDashboard = () => {
     setRequestText('');
     setTimeout(() => {
       setRequestSent(false);
+      setIsRequestModalOpen(false);
     }, 2000);
   };
 

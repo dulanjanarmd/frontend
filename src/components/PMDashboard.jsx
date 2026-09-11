@@ -74,15 +74,9 @@ const PMDashboard = () => {
 
       <PortfolioSummaryCards projects={projects} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <ProjectTable projects={projects} />
-          {/* We can place chat below the project table or beside it. Let's put it beside recent activity */}
-        </div>
-        <div>
-          <RecentActivity activities={recentActivities} />
-        </div>
-      </div>
+      <ProjectTable projects={projects} />
+
+      <RecentActivity activities={recentActivities} />
     </div>
   );
 };
