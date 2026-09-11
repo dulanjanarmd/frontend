@@ -322,7 +322,46 @@ export const DataProvider = ({ children }) => {
     }
   };
   
-  const updateIssue = (id, updates) => setIssues(issues.map(i => i.id === id ? { ...i, ...updates } : i));
+  const updateIssue = async (id, updates) => {
+    try {
+      const rawId = String(id).replace('i', '');
+      const res = await fetch(`http://localhost:8080/api/issues/${rawId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setIssues(prev => prev.map(i => String(i.id) === String(id) || String(i.id) === `i${rawId}` ? { ...i, ...updated } : i));
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
+  const deleteIssue = async (id) => {
+    try {
+      const rawId = String(id).replace('i', '');
+      const res = await fetch(`http://localhost:8080/api/issues/${rawId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      if (res.ok) {
+        setIssues(prev => prev.filter(i => String(i.id) !== String(id) && String(i.id) !== `i${rawId}`));
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
 
   const getIssueComments = async (issueId) => {
     try {
@@ -392,7 +431,7 @@ export const DataProvider = ({ children }) => {
       });
       if (res.ok) {
         const updated = await res.json();
-        updateIssue(issueId, { status: updated.status, assignee: updated.assignee });
+        setIssues(prev => prev.map(i => String(i.id) === String(issueId) || String(i.id) === `i${issueId}` ? { ...i, status: updated.status, assignee: updated.assignee } : i));
       }
     } catch (err) { console.error(err); }
   };
@@ -439,7 +478,7 @@ export const DataProvider = ({ children }) => {
     approvals, updateApproval, addApprovalRequest,
     consultations, addConsultation, updateConsultation,
     users,
-    issues, addIssue, updateIssue, getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus,
+    issues, addIssue, updateIssue, deleteIssue, getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus,
     getGlobalMessages, sendGlobalMessage
   };
 

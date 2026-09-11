@@ -18,6 +18,24 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import FloatingChatWidget from './FloatingChatWidget';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) {
+      return <div className="p-10 bg-white text-red-600">
+        <h1 className="text-2xl font-bold">React Crashed!</h1>
+        <pre className="mt-4 p-4 bg-slate-100 rounded text-sm overflow-auto">{this.state.error?.toString()}</pre>
+        <pre className="mt-4 p-4 bg-slate-100 rounded text-xs overflow-auto">{this.state.error?.stack}</pre>
+      </div>;
+    }
+    return this.props.children;
+  }
+}
+
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
   const location = useLocation();
@@ -151,15 +169,17 @@ const Navbar = () => {
 
 const Layout = () => {
   return (
-    <div className="min-h-screen bg-slate-100  transition-colors duration-300 flex flex-col font-sans">
-      <Navbar />
-      
-      <main className="flex-1 overflow-auto bg-slate-50 relative pb-10">
-        <Outlet />
-      </main>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-slate-100 transition-colors duration-300 flex flex-col font-sans">
+        <Navbar />
+        
+        <main className="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto mt-4 md:mt-8">
+          <Outlet />
+        </main>
 
-      <FloatingChatWidget />
-    </div>
+        <FloatingChatWidget />
+      </div>
+    </ErrorBoundary>
   );
 };
 

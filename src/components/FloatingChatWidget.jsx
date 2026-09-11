@@ -21,10 +21,10 @@ const FloatingChatWidget = () => {
   // Filter projects if needed, or assume all in `projects` are assigned
   // Here we use all projects available to the user.
   useEffect(() => {
-    if (projects.length > 0 && !selectedProjectId) {
+    if (projects?.length > 0 && !selectedProjectId) {
       setSelectedProjectId(projects[0].id);
     }
-  }, [projects]);
+  }, [projects, selectedProjectId]);
 
   const fetchMessages = async () => {
     if (!selectedProjectId) return;
@@ -56,7 +56,7 @@ const FloatingChatWidget = () => {
     const rawId = String(selectedProjectId).replace('p', '');
     const savedMsg = await sendGlobalMessage(rawId, newMessage);
     if (savedMsg) {
-      setMessages([...messages, { ...savedMsg, sender: currentUser }]);
+      setMessages([...(messages || []), { ...savedMsg, sender: currentUser }]);
       setNewMessage('');
       setTimeout(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -103,7 +103,7 @@ const FloatingChatWidget = () => {
                 onChange={(e) => setSelectedProjectId(e.target.value)}
               >
                 <option value="" disabled>Select Project</option>
-                {projects.map(p => (
+                {projects?.map(p => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
               </select>
@@ -118,11 +118,11 @@ const FloatingChatWidget = () => {
                 </div>
               ) : loading ? (
                 <p className="text-center text-slate-400 text-sm mt-4">Loading messages...</p>
-              ) : messages.length === 0 ? (
+              ) : !messages || messages.length === 0 ? (
                 <p className="text-center text-slate-400 text-sm mt-4 italic">No messages yet. Start the conversation!</p>
               ) : (
                 messages.map(msg => {
-                  const isMe = String(msg.sender?.id) === String(currentUser.id);
+                  const isMe = String(msg?.sender?.id) === String(currentUser?.id);
                   return (
                     <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                       <div className="flex items-baseline gap-2 mb-1">
